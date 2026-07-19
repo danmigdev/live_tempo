@@ -76,8 +76,8 @@ Categories:
   - Multimedia
 License: MIT
 AuthorName: Tuo Nome
-SourceCode: https://github.com/TUO-USERNAME/live_tempo
-IssueTracker: https://github.com/TUO-USERNAME/live_tempo/issues
+SourceCode: https://github.com/danmigdev/live_tempo
+IssueTracker: https://github.com/danmigdev/live_tempo/issues
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags

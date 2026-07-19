@@ -8,8 +8,8 @@ Categories:
 License: MIT
 AuthorName: Tuo Nome
 WebSite: https://TUO-PROGETTO.web.app
-SourceCode: https://github.com/TUO-USERNAME/live_tempo
-IssueTracker: https://github.com/TUO-USERNAME/live_tempo/issues
+SourceCode: https://github.com/danmigdev/live_tempo
+IssueTracker: https://github.com/danmigdev/live_tempo/issues
 
 AutoName: LiveTempo
 Summary: Gestisci playlist e BPM per performance live
@@ -32,7 +32,7 @@ CurrentVersion: 1.0.0
 CurrentVersionCode: 1
 
 RepoType: git
-Repo: https://github.com/TUO-USERNAME/live_tempo.git
+Repo: https://github.com/danmigdev/live_tempo.git
 
 Builds:
   - versionName: '1.0.0'
