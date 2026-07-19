@@ -23,7 +23,7 @@ var I18n = {
       confirmDeletePlaylist: 'Eliminare playlist e tutte le sue canzoni?',
       newSong: 'Nuova Canzone',
       editSong: 'Modifica Canzone',
-      songsCount: function(n) { return n + ' canzone' + (n !== 1 ? 'i' : ''); },
+      songsCount: function(n) { return n + ' canzon' + (n !== 1 ? 'i' : 'e'); },
       songTitleLabel: 'Titolo canzone',
       songTitlePlaceholder: 'Es. Bohemian Rhapsody',
       bpmLabel: 'BPM',
