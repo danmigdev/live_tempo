@@ -34,15 +34,19 @@ jobs:
       - name: Build Capacitor web assets
         run: npx cap sync android
 
-      - name: Build APK
+      - name: Build Debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
+          ./gradlew assembleDebug
 
-      - name: Sign APK
+      - name: Build Release APK
+        run: |
+          cd android
+          ./gradlew assembleRelease
+        continue-on-error: true
+
+      - name: Sign Release APK
         uses: r0adkll/sign-android-release@v1
         id: sign_apk
         with:
@@ -53,21 +57,16 @@ jobs:
           keyPassword: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
         continue-on-error: true
 
-      - name: Copy APK for release
+      - name: Prepare APK for release
         run: |
           mkdir -p release
+          # Prefer signed release, fall back to debug (always installable)
           if [ -f android/app/build/outputs/apk/release/app-release-unsigned-signed.apk ]; then
             cp android/app/build/outputs/apk/release/app-release-unsigned-signed.apk release/livetempo.apk
-          elif [ -f android/app/build/outputs/apk/release/app-release-unsigned.apk ]; then
-            cp android/app/build/outputs/apk/release/app-release-unsigned.apk release/livetempo.apk
-          elif [ -f android/app/build/outputs/apk/debug/app-debug.apk ]; then
-            cp android/app/build/outputs/apk/debug/app-debug.apk release/livetempo.apk
+            echo "Using signed release APK"
           else
-            echo "No APK found, listing outputs:"
-            find android/app/build/outputs -name "*.apk" -type f
-            # Build debug APK as fallback
-            cd android && chmod +x gradlew && ./gradlew assembleDebug
-            cp app/build/outputs/apk/debug/app-debug.apk ../release/livetempo.apk
+            cp android/app/build/outputs/apk/debug/app-debug.apk release/livetempo.apk
+            echo "Using debug APK (installable, for testing)"
           fi
 
       - name: Create GitHub Release
