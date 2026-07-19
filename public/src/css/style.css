@@ -325,6 +325,15 @@ input, button { font-family: inherit; }
 }
 .fab:active { transform: scale(0.92); }
 
+.fab-yt {
+  bottom: calc(100px + var(--safe-bottom));
+  background: #FF0000;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255, 0, 0, 0.4);
+  width: 48px;
+  height: 48px;
+}
+
 /* --- Playlist Detail --- */
 .playlist-header-bar {
   display: flex;
@@ -694,6 +703,7 @@ input, button { font-family: inherit; }
   }
 
   .fab { right: calc(50% - 320px + 24px); }
+  .fab-yt { right: calc(50% - 320px + 24px); }
 
   .login-card { padding: 56px 48px; }
 }
@@ -702,4 +712,5 @@ input, button { font-family: inherit; }
   .app-main { max-width: 720px; }
   .playlist-grid { grid-template-columns: repeat(3, 1fr); }
   .fab { right: calc(50% - 360px + 24px); }
+  .fab-yt { right: calc(50% - 360px + 24px); }
 }
