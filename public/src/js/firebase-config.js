@@ -1,16 +1,11 @@
-// Replace these values with your Firebase project configuration
-// 1. Go to https://console.firebase.google.com/
-// 2. Create a project (or use existing)
-// 3. Project Settings > General > Your apps > Web app
-// 4. Copy the firebaseConfig object here
-
+// Firebase configuration for LiveTempo
 const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT.firebaseapp.com',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_PROJECT.appspot.com',
-  messagingSenderId: 'YOUR_SENDER_ID',
-  appId: 'YOUR_APP_ID'
+  apiKey: 'AIzaSyAIVkxSZ6xhqyWxL8dM_1gvC5wPaMWd7ls',
+  authDomain: 'livetempo.firebaseapp.com',
+  projectId: 'livetempo',
+  storageBucket: 'livetempo.firebasestorage.app',
+  messagingSenderId: '69546808824',
+  appId: '1:69546808824:web:f98b1ddc19c50c9a8a720d'
 };
 
 // Initialize Firebase
