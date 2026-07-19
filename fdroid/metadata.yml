@@ -4,27 +4,26 @@
 
 Categories:
   - Multimedia
-  - Navigation
 License: MIT
-AuthorName: Tuo Nome
-WebSite: https://TUO-PROGETTO.web.app
+AuthorName: danmigdev
+WebSite: https://github.com/danmigdev/live_tempo
 SourceCode: https://github.com/danmigdev/live_tempo
 IssueTracker: https://github.com/danmigdev/live_tempo/issues
 
 AutoName: LiveTempo
-Summary: Gestisci playlist e BPM per performance live
+Summary: Manage song playlists with BPM for live performances
 Description: |
-  LiveTempo ti aiuta a gestire le tue playlist di canzoni con i BPM
-  di riferimento per le performance dal vivo. Prima di ogni canzone,
-  controlla il BPM per impostare il tempo corretto.
+  LiveTempo helps you manage song playlists with reference BPMs
+  for live performances. Before each song, check the BPM to set
+  the correct tempo.
 
-  Funzionalita':
-  - Accedi con Google
-  - Crea playlist di canzoni
-  - Associa un BPM a ogni canzone
-  - Tap Tempo per calcolare il BPM battendo il ritmo
-  - BPM color-coded: lenti (blu), medi (verde), veloci (arancione)
-  - Dark theme ottimizzato per ambienti live
+  Features:
+  - Sign in with Google
+  - Create song playlists
+  - Set a BPM for each song
+  - Tap Tempo to calculate BPM by tapping the rhythm
+  - Color-coded BPM: slow (blue), medium (green), fast (orange)
+  - Dark theme optimized for live environments
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
