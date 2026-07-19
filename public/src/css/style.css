@@ -304,6 +304,14 @@ input, button { font-family: inherit; }
   margin-top: 4px;
 }
 
+.empty-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
 /* --- FAB (Floating Action Button) --- */
 .fab {
   position: fixed;
@@ -670,6 +678,15 @@ input, button { font-family: inherit; }
 
 .yt-song-bpm-input {
   flex-shrink: 0;
+}
+
+.yt-playlist-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 8px 4px 12px;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
 }
 
 @media (min-width: 600px) {

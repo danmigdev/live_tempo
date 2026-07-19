@@ -5,9 +5,14 @@ var PlaylistListComponent = {
   unsubscribe: null,
 
   init: function () {
-    var self = this;
     document.getElementById('btn-new-playlist').addEventListener('click', function () {
       App.showPlaylistNameModal(null);
+    });
+    document.getElementById('btn-empty-manual').addEventListener('click', function () {
+      App.showPlaylistNameModal(null);
+    });
+    document.getElementById('btn-empty-yt').addEventListener('click', function () {
+      YoutubeImportComponent.show(null);
     });
   },
 
@@ -31,6 +36,7 @@ var PlaylistListComponent = {
     var container = document.getElementById('playlist-list');
     var emptyEl = document.getElementById('empty-playlists');
 
+    // Show empty state
     if (this.playlists.length === 0) {
       container.innerHTML = '';
       emptyEl.classList.remove('hidden');

@@ -1,8 +1,9 @@
 // YouTube playlist import component
 
 var YoutubeImportComponent = {
-  currentPlaylistId: null,
+  currentPlaylistId: null, // null = create new playlist from YT
   fetchedSongs: [],
+  playlistTitle: '',
 
   init: function () {
     var self = this;
@@ -24,14 +25,21 @@ var YoutubeImportComponent = {
     });
   },
 
+  // playlistId = null means create a new playlist from the YouTube data
   show: function (playlistId) {
-    this.currentPlaylistId = playlistId;
+    this.currentPlaylistId = playlistId || null;
     this.fetchedSongs = [];
+    this.playlistTitle = '';
     document.getElementById('yt-url-input').value = '';
     document.getElementById('yt-results').classList.add('hidden');
     document.getElementById('yt-loading').classList.add('hidden');
     document.getElementById('yt-error').classList.add('hidden');
     document.getElementById('btn-import-selected').classList.add('hidden');
+    if (playlistId) {
+      document.getElementById('btn-import-selected').textContent = 'Import Selected';
+    } else {
+      document.getElementById('btn-import-selected').textContent = 'Create Playlist & Import';
+    }
 
     document.getElementById('modal-backdrop').classList.remove('hidden');
     document.getElementById('modal-yt-import').classList.remove('hidden');
@@ -57,15 +65,20 @@ var YoutubeImportComponent = {
     document.getElementById('yt-results').classList.add('hidden');
     document.getElementById('yt-error').classList.add('hidden');
 
-    this.fetchAllPlaylistItems(playlistId, [], '')
-      .then(function (songs) {
-        self.fetchedSongs = songs;
+    // Fetch playlist info + items in parallel
+    Promise.all([
+      this.fetchPlaylistInfo(playlistId),
+      this.fetchAllPlaylistItems(playlistId)
+    ])
+      .then(function (results) {
+        self.playlistTitle = results[0];
+        self.fetchedSongs = results[1];
         document.getElementById('yt-loading').classList.add('hidden');
-        if (songs.length === 0) {
+        if (self.fetchedSongs.length === 0) {
           self.showError('Nessun video trovato nella playlist.');
           return;
         }
-        self.renderResults(songs);
+        self.renderResults(self.playlistTitle, self.fetchedSongs);
       })
       .catch(function (error) {
         document.getElementById('yt-loading').classList.add('hidden');
@@ -74,43 +87,68 @@ var YoutubeImportComponent = {
       });
   },
 
-  fetchAllPlaylistItems: function (playlistId, accumulated, pageToken) {
-    var self = this;
-    var url = 'https://www.googleapis.com/youtube/v3/playlistItems' +
+  fetchPlaylistInfo: function (playlistId) {
+    var url = 'https://www.googleapis.com/youtube/v3/playlists' +
       '?part=snippet' +
-      '&maxResults=50' +
-      '&playlistId=' + encodeURIComponent(playlistId) +
+      '&id=' + encodeURIComponent(playlistId) +
       '&key=' + YOUTUBE_API_KEY;
-
-    if (pageToken) {
-      url += '&pageToken=' + pageToken;
-    }
 
     return fetch(url)
       .then(function (response) { return response.json(); })
       .then(function (data) {
-        if (data.error) {
-          throw new Error(data.error.message);
+        if (data.items && data.items.length > 0) {
+          return data.items[0].snippet.title;
         }
-
-        var items = data.items || [];
-        items.forEach(function (item) {
-          accumulated.push({
-            title: item.snippet.title,
-            videoId: item.snippet.resourceId.videoId
-          });
-        });
-
-        if (data.nextPageToken) {
-          return self.fetchAllPlaylistItems(playlistId, accumulated, data.nextPageToken);
-        }
-        return accumulated;
+        return 'YouTube Playlist';
       });
   },
 
-  renderResults: function (songs) {
+  fetchAllPlaylistItems: function (playlistId) {
+    var self = this;
+    var accumulated = [];
+
+    function fetchPage(pageToken) {
+      var url = 'https://www.googleapis.com/youtube/v3/playlistItems' +
+        '?part=snippet' +
+        '&maxResults=50' +
+        '&playlistId=' + encodeURIComponent(playlistId) +
+        '&key=' + YOUTUBE_API_KEY;
+
+      if (pageToken) {
+        url += '&pageToken=' + pageToken;
+      }
+
+      return fetch(url)
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+          if (data.error) throw new Error(data.error.message);
+
+          (data.items || []).forEach(function (item) {
+            accumulated.push({
+              title: item.snippet.title,
+              videoId: item.snippet.resourceId.videoId
+            });
+          });
+
+          if (data.nextPageToken) {
+            return fetchPage(data.nextPageToken);
+          }
+          return accumulated;
+        });
+    }
+
+    return fetchPage('');
+  },
+
+  renderResults: function (playlistTitle, songs) {
     var container = document.getElementById('yt-songs-list');
-    container.innerHTML = songs.map(function (song, index) {
+
+    var titleHtml = '';
+    if (!this.currentPlaylistId && playlistTitle) {
+      titleHtml = '<div class="yt-playlist-title">Playlist: ' + escapeHtml(playlistTitle) + '</div>';
+    }
+
+    container.innerHTML = titleHtml + songs.map(function (song, index) {
       return '\
         <div class="yt-song-item">\
           <input type="checkbox" class="yt-song-check" data-index="' + index + '" checked>\
@@ -130,38 +168,57 @@ var YoutubeImportComponent = {
   importSelected: function () {
     var self = this;
     var checkboxes = document.querySelectorAll('.yt-song-check:checked');
-    var imported = 0;
 
-    var promises = [];
-    checkboxes.forEach(function (cb) {
-      var index = parseInt(cb.dataset.index);
-      var song = self.fetchedSongs[index];
-      var bpmInput = document.querySelector('.yt-bpm-input[data-index="' + index + '"]');
-      var bpm = bpmInput ? parseInt(bpmInput.value) || 0 : 0;
+    if (checkboxes.length === 0) {
+      showToast('Select at least one song', 'error');
+      return;
+    }
 
-      promises.push(
-        getNextSongOrder(self.currentPlaylistId).then(function (order) {
-          return createSong(self.currentPlaylistId, song.title, bpm || 120, order);
-        })
-      );
-    });
+    // If no playlistId, create a new playlist first
+    var createPromise;
+    if (this.currentPlaylistId) {
+      createPromise = Promise.resolve(this.currentPlaylistId);
+    } else {
+      var playlistName = this.playlistTitle || 'YouTube Import';
+      createPromise = createPlaylist(playlistName, currentUser.uid).then(function (ref) {
+        return ref.id;
+      });
+    }
 
-    Promise.all(promises).then(function () {
+    createPromise.then(function (playlistId) {
+      var promises = [];
+      checkboxes.forEach(function (cb) {
+        var index = parseInt(cb.dataset.index);
+        var song = self.fetchedSongs[index];
+        var bpmInput = document.querySelector('.yt-bpm-input[data-index="' + index + '"]');
+        var bpm = bpmInput ? parseInt(bpmInput.value) || 0 : 0;
+
+        promises.push(
+          getNextSongOrder(playlistId).then(function (order) {
+            return createSong(playlistId, song.title, bpm || 120, order);
+          })
+        );
+      });
+
+      return Promise.all(promises).then(function () {
+        return playlistId;
+      });
+    }).then(function (playlistId) {
       self.hide();
       showToast(checkboxes.length + ' songs imported', 'success');
-    }).catch(function () {
+      // Navigate to the new playlist
+      if (!self.currentPlaylistId) {
+        App.openPlaylist(playlistId);
+      }
+    }).catch(function (error) {
+      console.error('Import error:', error);
       showToast('Error importing songs', 'error');
     });
   },
 
   extractPlaylistId: function (url) {
-    var match = url.match(/[?&]list=([^&]+)/);
+    var match = url.match(/[?&]list=([^&\s]+)/);
     if (match) return match[1];
-
-    // Handle youtu.be or short URLs
-    match = url.match(/youtube\.com\/playlist\?list=([^&]+)/);
-    if (match) return match[1];
-
     return null;
   },
 
