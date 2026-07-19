@@ -141,6 +141,7 @@ var YoutubeImportComponent = {
   },
 
   renderResults: function (playlistTitle, songs) {
+    var self = this;
     var container = document.getElementById('yt-songs-list');
 
     var titleHtml = '';
@@ -148,18 +149,36 @@ var YoutubeImportComponent = {
       titleHtml = '<div class="yt-playlist-title">Playlist: ' + escapeHtml(playlistTitle) + '</div>';
     }
 
+    // Get existing song titles for dedup if importing into existing playlist
+    var existingTitles = [];
+    if (this.currentPlaylistId) {
+      existingTitles = (PlaylistDetailComponent.songs || []).map(function (s) {
+        return s.title.toLowerCase().trim();
+      });
+    }
+
+    var newCount = 0;
+    var dupCount = 0;
+
     container.innerHTML = titleHtml + songs.map(function (song, index) {
+      var isDup = existingTitles.indexOf(song.title.toLowerCase().trim()) !== -1;
+      if (isDup) dupCount++; else newCount++;
       return '\
-        <div class="yt-song-item">\
-          <input type="checkbox" class="yt-song-check" data-index="' + index + '" checked>\
+        <div class="yt-song-item' + (isDup ? ' yt-song-dup' : '') + '">\
+          <input type="checkbox" class="yt-song-check" data-index="' + index + '" ' + (isDup ? 'disabled' : 'checked') + '>\
           <div class="yt-song-info">\
             <span class="yt-song-title">' + escapeHtml(song.title) + '</span>\
+            ' + (isDup ? '<span class="yt-song-already">already in playlist</span>' : '') + '\
           </div>\
           <div class="yt-song-bpm-input">\
-            <input type="number" class="form-input yt-bpm-input" data-index="' + index + '" placeholder="BPM" min="1" max="400" style="width:80px;padding:8px;text-align:center">\
+            <input type="number" class="form-input yt-bpm-input" data-index="' + index + '" placeholder="BPM" min="1" max="400" style="width:80px;padding:8px;text-align:center" ' + (isDup ? 'disabled' : '') + '>\
           </div>\
         </div>';
     }).join('');
+
+    var summary = newCount + ' new';
+    if (dupCount > 0) summary += ', ' + dupCount + ' already in playlist (skipped)';
+    container.insertAdjacentHTML('afterbegin', '<div class="yt-summary">' + summary + '</div>');
 
     document.getElementById('yt-results').classList.remove('hidden');
     document.getElementById('btn-import-selected').classList.remove('hidden');
@@ -186,33 +205,38 @@ var YoutubeImportComponent = {
     }
 
     createPromise.then(function (playlistId) {
+      // Assign sequential orders
+      var order = 0;
       var promises = [];
       checkboxes.forEach(function (cb) {
         var index = parseInt(cb.dataset.index);
         var song = self.fetchedSongs[index];
         var bpmInput = document.querySelector('.yt-bpm-input[data-index="' + index + '"]');
-        var bpm = bpmInput ? parseInt(bpmInput.value) || 0 : 0;
+        var bpm = bpmInput ? parseInt(bpmInput.value) || 120 : 120;
 
         promises.push(
-          getNextSongOrder(playlistId).then(function (order) {
-            return createSong(playlistId, song.title, bpm || 120, order);
-          })
+          createSong(playlistId, song.title, bpm, order)
         );
+        order++;
       });
 
       return Promise.all(promises).then(function () {
         return playlistId;
       });
     }).then(function (playlistId) {
+      var playlistName = self.playlistTitle || 'YouTube Import';
       self.hide();
       showToast(checkboxes.length + ' songs imported', 'success');
-      // Navigate to the new playlist
+      // Navigate directly — bypass list lookup (listener may not have updated yet)
       if (!self.currentPlaylistId) {
-        App.openPlaylist(playlistId);
+        App.openPlaylistDirect(playlistId, playlistName);
       }
     }).catch(function (error) {
       console.error('Import error:', error);
-      showToast('Error importing songs', 'error');
+      var msg = 'Error importing songs';
+      if (error && error.message) msg = error.message;
+      else if (typeof error === 'string') msg = error;
+      showToast(msg, 'error');
     });
   },
 

@@ -680,6 +680,22 @@ input, button { font-family: inherit; }
   flex-shrink: 0;
 }
 
+.yt-summary {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 4px 4px 12px;
+}
+
+.yt-song-dup {
+  opacity: 0.5;
+}
+
+.yt-song-already {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .yt-playlist-title {
   font-size: 0.95rem;
   font-weight: 600;

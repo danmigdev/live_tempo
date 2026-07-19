@@ -121,10 +121,14 @@ var App = {
   openPlaylist: function (playlistId) {
     var playlist = PlaylistListComponent.playlists.find(function (p) { return p.id === playlistId; });
     if (!playlist) return;
+    this.openPlaylistDirect(playlistId, playlist.name);
+  },
+
+  openPlaylistDirect: function (playlistId, playlistName) {
     this.previousView = 'playlist-list';
     this.currentPlaylistId = playlistId;
-    this.currentPlaylistName = playlist.name;
-    PlaylistDetailComponent.show(playlistId, playlist.name);
+    this.currentPlaylistName = playlistName;
+    PlaylistDetailComponent.show(playlistId, playlistName);
   },
 
   goBack: function () {
