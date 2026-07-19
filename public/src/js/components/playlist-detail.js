@@ -131,34 +131,28 @@ var PlaylistDetailComponent = {
       });
     }
 
-    // Add song FAB
-    var existingFab = document.getElementById('fab-add-song');
-    if (!existingFab) {
-      var fab = document.createElement('button');
-      fab.id = 'fab-add-song';
-      fab.className = 'fab';
-      fab.title = I18n.t('addSong');
-      fab.setAttribute('aria-label', I18n.t('addSong'));
-      fab.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-      fab.addEventListener('click', function () {
+    // Bottom action bar
+    var existingBar = document.getElementById('playlist-actions-bar');
+    if (!existingBar) {
+      var bar = document.createElement('div');
+      bar.id = 'playlist-actions-bar';
+      bar.className = 'playlist-actions-bar';
+      bar.innerHTML = '\
+        <button id="btn-add-song-bar" class="btn btn-primary">\
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>\
+          ' + I18n.t('addSong') + '\
+        </button>\
+        <button id="btn-yt-import-bar" class="btn btn-outline">\
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>\
+          YouTube\
+        </button>';
+      bar.querySelector('#btn-add-song-bar').addEventListener('click', function () {
         App.showSongForm(self.playlistId, null);
       });
-      document.getElementById('view-playlist-detail').appendChild(fab);
-    }
-
-    // YouTube import FAB
-    var existingYtFab = document.getElementById('fab-yt-import');
-    if (!existingYtFab) {
-      var ytFab = document.createElement('button');
-      ytFab.id = 'fab-yt-import';
-      ytFab.className = 'fab fab-yt';
-      ytFab.title = 'Import from YouTube';
-      ytFab.setAttribute('aria-label', 'Import from YouTube');
-      ytFab.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>';
-      ytFab.addEventListener('click', function () {
+      bar.querySelector('#btn-yt-import-bar').addEventListener('click', function () {
         YoutubeImportComponent.show(self.playlistId);
       });
-      document.getElementById('view-playlist-detail').appendChild(ytFab);
+      document.getElementById('view-playlist-detail').appendChild(bar);
     }
   },
 

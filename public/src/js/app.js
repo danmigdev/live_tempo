@@ -218,6 +218,8 @@ function showSubView(viewId) {
 
   var fab = document.getElementById('fab-add-song');
   if (fab) fab.remove();
+  var bar = document.getElementById('playlist-actions-bar');
+  if (bar) bar.remove();
 }
 
 function escapeHtml(str) {
