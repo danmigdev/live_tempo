@@ -19,16 +19,15 @@ var PlaylistDetailComponent = {
 
     document.getElementById('btn-delete-playlist').addEventListener('click', function () {
       App.showConfirmModal(
-        'Eliminare "' + self.playlistName + '" e tutte le sue canzoni?',
+        I18n.t('confirmDeletePlaylist'),
         function () {
           deleteAllSongsInPlaylist(self.playlistId).then(function () {
             return deletePlaylist(self.playlistId);
           }).then(function () {
             App.goBack();
-            showToast('Playlist eliminata', 'success');
-          }).catch(function (error) {
-            console.error('Delete playlist error:', error);
-            showToast('Errore durante l\'eliminazione', 'error');
+            showToast(I18n.t('playlistDeleted'), 'success');
+          }).catch(function () {
+            showToast(I18n.t('deleteError'), 'error');
           });
         }
       );
@@ -61,10 +60,7 @@ var PlaylistDetailComponent = {
     var emptyEl = document.getElementById('empty-songs');
     var countEl = document.getElementById('detail-song-count');
 
-    countEl.textContent = this.songs.length + ' canzone' + (this.songs.length !== 1 ? ' (coming soon: plural)' : '');
-
-    // Fix plural
-    countEl.textContent = this.songs.length + ' canzone' + (this.songs.length !== 1 ? 'i' : '');
+    countEl.textContent = I18n.t('songsCount')(this.songs.length);
 
     if (this.songs.length === 0) {
       container.innerHTML = '';
@@ -83,13 +79,13 @@ var PlaylistDetailComponent = {
               <span class="song-bpm-label">BPM</span>\
             </div>\
             <div class="song-actions">\
-              <button class="btn-icon btn-sm edit-song-btn" data-id="' + song.id + '" title="Modifica" aria-label="Modifica">\
+              <button class="btn-icon btn-sm edit-song-btn" data-id="' + song.id + '" title="' + I18n.t('editSongTitle') + '" aria-label="' + I18n.t('editSongTitle') + '">\
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\
                   <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>\
                   <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>\
                 </svg>\
               </button>\
-              <button class="btn-icon btn-sm btn-danger delete-song-btn" data-id="' + song.id + '" title="Elimina" aria-label="Elimina">\
+              <button class="btn-icon btn-sm btn-danger delete-song-btn" data-id="' + song.id + '" title="' + I18n.t('deleteSongTitle') + '" aria-label="' + I18n.t('deleteSongTitle') + '">\
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\
                   <polyline points="3 6 5 6 21 6"/>\
                   <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>\
@@ -116,11 +112,10 @@ var PlaylistDetailComponent = {
           var song = self.songs.find(function (s) { return s.id === songId; });
           if (!song) return;
           App.showConfirmModal(
-            'Eliminare "' + song.title + '"?',
+            I18n.t('confirmDeleteSong') + ' "' + song.title + '"?',
             function () {
-              deleteSong(songId).catch(function (error) {
-                console.error('Delete song error:', error);
-                showToast('Errore durante l\'eliminazione', 'error');
+              deleteSong(songId).catch(function () {
+                showToast(I18n.t('deleteError'), 'error');
               });
             }
           );
@@ -142,8 +137,8 @@ var PlaylistDetailComponent = {
       var fab = document.createElement('button');
       fab.id = 'fab-add-song';
       fab.className = 'fab';
-      fab.title = 'Aggiungi canzone';
-      fab.setAttribute('aria-label', 'Aggiungi canzone');
+      fab.title = I18n.t('addSong');
+      fab.setAttribute('aria-label', I18n.t('addSong'));
       fab.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
       fab.addEventListener('click', function () {
         App.showSongForm(self.playlistId, null);

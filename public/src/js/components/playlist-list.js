@@ -6,7 +6,6 @@ var PlaylistListComponent = {
 
   init: function () {
     var self = this;
-
     document.getElementById('btn-new-playlist').addEventListener('click', function () {
       App.showPlaylistNameModal(null);
     });
@@ -70,7 +69,7 @@ var PlaylistListComponent = {
 
   show: function () {
     showSubView('view-playlist-list');
-    document.getElementById('header-title').textContent = 'Le mie Playlist';
+    document.getElementById('header-title').textContent = I18n.t('myPlaylists');
     document.getElementById('btn-back').classList.add('hidden');
   }
 };

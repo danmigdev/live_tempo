@@ -10,7 +10,8 @@ var LoginComponent = {
 
     btn.addEventListener('click', function () {
       btn.disabled = true;
-      btn.textContent = 'Signing in...';
+      var span = btn.querySelector('span');
+      if (span) span.textContent = I18n.t('signingIn');
       signInWithGoogle().then(function (user) {
         if (!user) {
           btn.disabled = false;
@@ -19,7 +20,7 @@ var LoginComponent = {
       }).catch(function () {
         btn.disabled = false;
         btn.innerHTML = self.originalHtml;
-        showToast('Login error. Please try again.', 'error');
+        showToast(I18n.t('loginError'), 'error');
       });
     });
   },

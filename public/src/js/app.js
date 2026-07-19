@@ -10,6 +10,9 @@ var App = {
   init: function () {
     var self = this;
 
+    // Init i18n first
+    I18n.init();
+
     // Init all components
     LoginComponent.init();
     PlaylistListComponent.init();
@@ -70,9 +73,21 @@ var App = {
     });
   },
 
+  refreshUi: function () {
+    // Re-apply i18n to static HTML elements
+    I18n.apply();
+    // If on playlist list, re-render
+    if (this.currentPlaylistId === null && currentUser) {
+      PlaylistListComponent.render();
+    }
+    // If on playlist detail, re-render
+    if (this.currentPlaylistId && PlaylistDetailComponent.playlistId) {
+      PlaylistDetailComponent.render();
+    }
+  },
+
   handleAuthChange: function (user) {
     if (user) {
-      // Update avatar
       var avatar = document.getElementById('user-avatar');
       if (user.photoURL) {
         avatar.src = user.photoURL;
@@ -81,7 +96,6 @@ var App = {
         avatar.style.display = 'none';
       }
 
-      // Show app view
       showView('view-app');
       this.navigateToPlaylistList();
       PlaylistListComponent.load(user.uid);
@@ -110,7 +124,7 @@ var App = {
   },
 
   goBack: function () {
-    if (SongFormComponent.hide) SongFormComponent.hide();
+    SongFormComponent.hide();
     this.navigateToPlaylistList();
   },
 
@@ -123,7 +137,7 @@ var App = {
   showPlaylistNameModal: function (playlistId, currentName) {
     document.getElementById('playlist-id').value = playlistId || '';
     document.getElementById('playlist-name').value = currentName || '';
-    document.getElementById('playlist-modal-title').textContent = playlistId ? 'Rinomina Playlist' : 'Nuova Playlist';
+    document.getElementById('playlist-modal-title').textContent = playlistId ? I18n.t('renamePlaylist') : I18n.t('newPlaylist');
     document.getElementById('modal-backdrop').classList.remove('hidden');
     document.getElementById('modal-playlist-name').classList.remove('hidden');
     document.getElementById('playlist-name').focus();
@@ -140,7 +154,7 @@ var App = {
     var name = document.getElementById('playlist-name').value.trim();
 
     if (!name) {
-      showToast('Inserisci un nome per la playlist', 'error');
+      showToast(I18n.t('enterPlaylistName'), 'error');
       return;
     }
 
@@ -148,20 +162,18 @@ var App = {
     if (playlistId) {
       updatePlaylist(playlistId, name).then(function () {
         self.hidePlaylistNameModal();
-        showToast('Playlist rinominata', 'success');
-      }).catch(function (error) {
-        console.error('Update playlist error:', error);
-        showToast('Errore durante il salvataggio', 'error');
+        showToast(I18n.t('playlistRenamed'), 'success');
+      }).catch(function () {
+        showToast(I18n.t('saveError'), 'error');
       });
     } else {
       var user = currentUser;
       if (!user) return;
       createPlaylist(name, user.uid).then(function () {
         self.hidePlaylistNameModal();
-        showToast('Playlist creata', 'success');
-      }).catch(function (error) {
-        console.error('Create playlist error:', error);
-        showToast('Errore durante la creazione', 'error');
+        showToast(I18n.t('playlistCreated'), 'success');
+      }).catch(function () {
+        showToast(I18n.t('createError'), 'error');
       });
     }
   },
@@ -196,7 +208,6 @@ function showSubView(viewId) {
   });
   document.getElementById(viewId).classList.remove('hidden');
 
-  // Hide FABs from other views
   var fab = document.getElementById('fab-add-song');
   if (fab) fab.remove();
 }
@@ -215,10 +226,9 @@ function formatDate(timestamp) {
   var diff = now - d;
   var days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-  if (days === 0) return 'Oggi';
-  if (days === 1) return 'Ieri';
-  if (days < 7) return days + ' giorni fa';
-  return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (days === 0) return I18n.t('today');
+  if (days === 1) return I18n.t('yesterday');
+  return I18n.t('daysAgo')(days);
 }
 
 function getBpmClass(bpm) {
@@ -236,7 +246,6 @@ function showToast(message, type) {
   toast.textContent = message;
   container.appendChild(toast);
 
-  // Trigger animation
   requestAnimationFrame(function () {
     toast.classList.add('toast-visible');
   });

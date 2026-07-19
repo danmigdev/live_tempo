@@ -94,6 +94,35 @@ input, button { font-family: inherit; }
   margin-bottom: 32px;
 }
 
+/* --- Language Picker --- */
+.lang-picker {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.lang-picker label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.lang-select {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.lang-select:focus {
+  border-color: var(--accent);
+}
+
 /* --- Buttons --- */
 .btn {
   display: inline-flex;

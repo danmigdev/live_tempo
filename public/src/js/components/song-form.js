@@ -31,7 +31,7 @@ var SongFormComponent = {
     document.getElementById('song-playlist-id').value = playlistId;
     document.getElementById('song-title').value = song ? song.title : '';
     document.getElementById('song-bpm').value = song ? song.bpm : '';
-    document.getElementById('song-form-title').textContent = song ? 'Modifica Canzone' : 'Nuova Canzone';
+    document.getElementById('song-form-title').textContent = song ? I18n.t('editSong') : I18n.t('newSong');
     document.getElementById('btn-use-tap-bpm').classList.add('hidden');
     TapTempoComponent.reset();
 
@@ -53,11 +53,11 @@ var SongFormComponent = {
     var bpm = parseInt(document.getElementById('song-bpm').value, 10);
 
     if (!title) {
-      showToast('Inserisci il titolo della canzone', 'error');
+      showToast(I18n.t('enterSongTitle'), 'error');
       return;
     }
     if (!bpm || bpm < 1 || bpm > 400) {
-      showToast('Inserisci un BPM valido (1-400)', 'error');
+      showToast(I18n.t('enterValidBpm'), 'error');
       return;
     }
 
@@ -65,20 +65,18 @@ var SongFormComponent = {
     if (songId) {
       updateSong(songId, title, bpm).then(function () {
         self.hide();
-        showToast('Canzone aggiornata', 'success');
-      }).catch(function (error) {
-        console.error('Update song error:', error);
-        showToast('Errore durante il salvataggio', 'error');
+        showToast(I18n.t('songUpdated'), 'success');
+      }).catch(function () {
+        showToast(I18n.t('saveError'), 'error');
       });
     } else {
       getNextSongOrder(playlistId).then(function (order) {
         return createSong(playlistId, title, bpm, order);
       }).then(function () {
         self.hide();
-        showToast('Canzone aggiunta', 'success');
-      }).catch(function (error) {
-        console.error('Create song error:', error);
-        showToast('Errore durante il salvataggio', 'error');
+        showToast(I18n.t('songAdded'), 'success');
+      }).catch(function () {
+        showToast(I18n.t('saveError'), 'error');
       });
     }
   }
