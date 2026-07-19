@@ -1,49 +1,52 @@
 # F-Droid Metadata for LiveTempo
-# Submit this to: https://gitlab.com/fdroid/fdroiddata
-# Directory: metadata/it.livetempo.app.yml
+# Submit this file as: metadata/it.livetempo.app.yml
+# To: https://gitlab.com/fdroid/fdroiddata
 
 Categories:
   - Multimedia
 License: MIT
 AuthorName: danmigdev
-WebSite: https://github.com/danmigdev/live_tempo
 SourceCode: https://github.com/danmigdev/live_tempo
 IssueTracker: https://github.com/danmigdev/live_tempo/issues
+Changelog: https://github.com/danmigdev/live_tempo/releases
 
 AutoName: LiveTempo
 Summary: Manage song playlists with BPM for live performances
 Description: |
-  LiveTempo helps you manage song playlists with reference BPMs
-  for live performances. Before each song, check the BPM to set
-  the correct tempo.
+  LiveTempo helps musicians manage song playlists with reference
+  BPMs for live performances. Before each song starts, check the
+  BPM to set the correct tempo right from your phone.
 
   Features:
-  - Sign in with Google
-  - Create song playlists
-  - Set a BPM for each song
-  - Tap Tempo to calculate BPM by tapping the rhythm
-  - Color-coded BPM: slow (blue), medium (green), fast (orange)
-  - Dark theme optimized for live environments
-
-AutoUpdateMode: Version
-UpdateCheckMode: Tags
-CurrentVersion: 1.0.0
-CurrentVersionCode: 1
+  * Sign in with Google
+  * Create and manage song playlists
+  * Set a reference BPM for each song
+  * Tap Tempo: tap to calculate BPM from any rhythm
+  * Visual metronome pulse at the song's exact tempo
+  * Import playlists directly from YouTube
+  * Color-coded BPM badges (slow/medium/fast)
+  * Dark theme for stage environments
+  * Multi-language: Italian and English
 
 RepoType: git
 Repo: https://github.com/danmigdev/live_tempo.git
 
 Builds:
-  - versionName: '1.0.0'
-    versionCode: 1
-    commit: v1.0.0
+  - versionName: '1.0.2'
+    versionCode: 3
+    commit: v1.0.2
     subdir: .
-    gradle:
-      - yes
-    srclibs:
-      - Capacitor@v7.2.1
-    prebuild:
+    sudo:
+      - apt-get install -y nodejs npm
+    init:
       - npm ci
       - npx cap sync android
+    gradle:
+      - yes
     scanignore:
       - android/app/src/main/assets/public
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.0.2
+CurrentVersionCode: 3
