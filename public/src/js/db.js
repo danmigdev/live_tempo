@@ -14,6 +14,7 @@ function subscribePlaylists(userId, callback) {
       callback(playlists);
     }, function (error) {
       console.error('Playlists subscription error:', error);
+      if (window.showToast) showToast('Error loading playlists. Check console.', 'error');
       callback([]);
     });
 }
