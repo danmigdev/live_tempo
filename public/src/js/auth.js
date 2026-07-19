@@ -1,7 +1,7 @@
 // Auth state
-let currentUser = null;
-let authReady = false;
-const authCallbacks = [];
+var currentUser = null;
+var authReady = false;
+var authCallbacks = [];
 
 function onAuthChange(callback) {
   authCallbacks.push(callback);
@@ -14,7 +14,7 @@ function notifyAuthChange(user) {
 }
 
 // Init auth state listener
-onAuthStateChanged(auth, function (user) {
+auth.onAuthStateChanged(function (user) {
   authReady = true;
   if (user) {
     currentUser = {
@@ -31,9 +31,9 @@ onAuthStateChanged(auth, function (user) {
 
 // Google Sign-In
 function signInWithGoogle() {
-  const provider = new GoogleAuthProvider();
+  var provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
-  return signInWithPopup(auth, provider)
+  return auth.signInWithPopup(provider)
     .then(function (result) {
       return {
         uid: result.user.uid,
@@ -53,5 +53,5 @@ function signInWithGoogle() {
 
 // Sign out
 function signOutUser() {
-  return signOut(auth);
+  return auth.signOut();
 }

@@ -8,10 +8,7 @@ const firebaseConfig = {
   appId: '1:69546808824:web:f98b1ddc19c50c9a8a720d'
 };
 
-// Initialize Firebase
-const { initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } = window.FIREBASE_MODULES;
-const { getFirestore, collection, query, where, orderBy, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp, getDocs, writeBatch } = window.FIREBASE_MODULES;
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Initialize Firebase (compat / namespace SDK)
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();

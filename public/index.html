@@ -205,14 +205,10 @@
     <div id="toast-container" class="toast-container"></div>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
-    import { getFirestore, collection, query, where, orderBy, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp, getDocs, writeBatch } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
-
-    window.FIREBASE_MODULES = { initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, getFirestore, collection, query, where, orderBy, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp, getDocs, writeBatch };
-  </script>
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
 
   <!-- App scripts -->
   <script src="/src/js/firebase-config.js"></script>
