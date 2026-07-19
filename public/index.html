@@ -208,6 +208,36 @@
       </div>
     </div>
 
+    <!-- YouTube Import Modal -->
+    <div id="modal-yt-import" class="modal hidden">
+      <div class="modal-header">
+        <h3>Import from YouTube Playlist</h3>
+        <button id="btn-close-yt-import" class="btn-icon" data-i18n-title="close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>YouTube Playlist URL</label>
+          <div class="yt-url-row">
+            <input type="text" id="yt-url-input" class="form-input" placeholder="https://www.youtube.com/playlist?list=..." autocomplete="off">
+            <button type="button" id="btn-fetch-yt" class="btn btn-primary btn-sm">Fetch</button>
+          </div>
+        </div>
+        <div id="yt-loading" class="yt-loading hidden">Loading playlist...</div>
+        <div id="yt-error" class="yt-error hidden"></div>
+        <div id="yt-results" class="hidden">
+          <div id="yt-songs-list" class="yt-songs-list"></div>
+          <div class="form-actions">
+            <button type="button" id="btn-cancel-yt-import" class="btn btn-outline" data-i18n="cancel">Annulla</button>
+            <button type="button" id="btn-import-selected" class="btn btn-primary hidden">Import Selected</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast container -->
     <div id="toast-container" class="toast-container"></div>
   </div>
@@ -227,6 +257,7 @@
   <script src="/src/js/components/playlist-detail.js"></script>
   <script src="/src/js/components/song-form.js"></script>
   <script src="/src/js/components/tap-tempo.js"></script>
+  <script src="/src/js/components/import-youtube.js"></script>
   <script src="/src/js/app.js"></script>
 
   <!-- Service Worker registration -->

@@ -19,6 +19,7 @@ var App = {
     PlaylistDetailComponent.init();
     SongFormComponent.init();
     TapTempoComponent.init();
+    YoutubeImportComponent.init();
 
     // Modal backdrop closes modals
     document.getElementById('modal-backdrop').addEventListener('click', function () {
@@ -30,6 +31,9 @@ var App = {
       }
       if (!document.getElementById('modal-confirm').classList.contains('hidden')) {
         self.hideConfirmModal();
+      }
+      if (!document.getElementById('modal-yt-import').classList.contains('hidden')) {
+        YoutubeImportComponent.hide();
       }
     });
 

@@ -145,6 +145,20 @@ var PlaylistDetailComponent = {
       });
       document.getElementById('view-playlist-detail').appendChild(fab);
     }
+
+    // YouTube import button
+    var existingYtBtn = document.getElementById('btn-yt-import');
+    if (!existingYtBtn && !document.getElementById('empty-songs').classList.contains('hidden')) {
+      var ytBtn = document.createElement('button');
+      ytBtn.id = 'btn-yt-import';
+      ytBtn.className = 'btn btn-outline btn-sm';
+      ytBtn.style.cssText = 'display:block;margin:12px auto 0';
+      ytBtn.textContent = 'Import from YouTube';
+      ytBtn.addEventListener('click', function () {
+        YoutubeImportComponent.show(self.playlistId);
+      });
+      document.getElementById('empty-songs').appendChild(ytBtn);
+    }
   },
 
   show: function (playlistId, playlistName) {

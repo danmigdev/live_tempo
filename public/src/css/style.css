@@ -595,6 +595,74 @@ input, button { font-family: inherit; }
 .toast-error { border-left: 3px solid var(--danger); }
 
 /* --- Desktop / Tablet --- */
+/* --- YouTube Import --- */
+.yt-url-row {
+  display: flex;
+  gap: 8px;
+}
+
+.yt-url-row .form-input {
+  flex: 1;
+}
+
+.yt-url-row .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.yt-loading {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-secondary);
+}
+
+.yt-error {
+  padding: 12px;
+  background: rgba(239, 83, 80, 0.15);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
+.yt-songs-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  margin: 8px 0;
+}
+
+.yt-song-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.yt-song-check {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.yt-song-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.yt-song-title {
+  font-size: 0.9rem;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yt-song-bpm-input {
+  flex-shrink: 0;
+}
+
 @media (min-width: 600px) {
   .app-main {
     max-width: 640px;
