@@ -164,21 +164,15 @@ var App = {
 
     overlay.classList.remove('hidden');
 
-    // Start the metronome
+    // Start the metronome — runs infinitely until dismissed
     var intervalMs = 60000 / song.bpm;
     var beats = 0;
-    var maxBeats = 8;
 
     // First beat immediately
     flashBeat(0);
 
     var timer = setInterval(function () {
       beats++;
-      if (beats >= maxBeats) {
-        clearInterval(timer);
-        setTimeout(function () { overlay.classList.add('hidden'); }, 400);
-        return;
-      }
       flashBeat(beats % 4);
     }, intervalMs);
 
