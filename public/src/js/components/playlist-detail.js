@@ -126,7 +126,7 @@ var PlaylistDetailComponent = {
         item.addEventListener('click', function () {
           var songId = this.dataset.id;
           var song = self.songs.find(function (s) { return s.id === songId; });
-          if (song) App.showSongForm(self.playlistId, song);
+          if (song) App.showBpmPulse(song);
         });
       });
     }

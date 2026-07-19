@@ -141,6 +141,73 @@ var App = {
     SongFormComponent.show(playlistId, song);
   },
 
+  // BPM visual pulse / metronome
+  showBpmPulse: function (song) {
+    var self = this;
+    var overlay = document.getElementById('bpm-pulse');
+    var circle = document.getElementById('bpm-pulse-circle');
+    var valueEl = document.getElementById('bpm-pulse-value');
+    var beatBar = document.getElementById('bpm-pulse-beat');
+
+    valueEl.textContent = song.bpm;
+    var bpmClass = getBpmClass(song.bpm);
+    circle.style.borderColor = 'var(--' + bpmClass + ')';
+    valueEl.style.color = 'var(--' + bpmClass + ')';
+
+    // Create 4 beat dots
+    beatBar.innerHTML = '';
+    for (var i = 0; i < 4; i++) {
+      var dot = document.createElement('div');
+      dot.className = 'bpm-pulse-beat-dot';
+      beatBar.appendChild(dot);
+    }
+
+    overlay.classList.remove('hidden');
+
+    // Start the metronome
+    var intervalMs = 60000 / song.bpm;
+    var beats = 0;
+    var maxBeats = 8;
+
+    // First beat immediately
+    flashBeat(0);
+
+    var timer = setInterval(function () {
+      beats++;
+      if (beats >= maxBeats) {
+        clearInterval(timer);
+        setTimeout(function () { overlay.classList.add('hidden'); }, 400);
+        return;
+      }
+      flashBeat(beats % 4);
+    }, intervalMs);
+
+    function flashBeat(beatIndex) {
+      circle.classList.add('flash');
+      var dots = beatBar.querySelectorAll('.bpm-pulse-beat-dot');
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === beatIndex); });
+      setTimeout(function () { circle.classList.remove('flash'); }, 80);
+    }
+
+    // Close on tap
+    overlay.onclick = function (e) {
+      if (e.target === overlay) {
+        clearInterval(timer);
+        overlay.classList.add('hidden');
+      }
+    };
+
+    // Close on double-tap circle to edit
+    circle.ondblclick = function () {
+      clearInterval(timer);
+      overlay.classList.add('hidden');
+      self.showSongForm(PlaylistDetailComponent.playlistId, song);
+    };
+
+    // Edit via button
+    circle.title = 'Double-tap to edit';
+  },
+
   // Playlist name modal
   showPlaylistNameModal: function (playlistId, currentName) {
     document.getElementById('playlist-id').value = playlistId || '';
