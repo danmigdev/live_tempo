@@ -1,0 +1,50 @@
+# F-Droid Metadata for LiveTempo
+# Submit this to: https://gitlab.com/fdroid/fdroiddata
+# Directory: metadata/it.livetempo.app.yml
+
+Categories:
+  - Multimedia
+  - Navigation
+License: MIT
+AuthorName: Tuo Nome
+WebSite: https://TUO-PROGETTO.web.app
+SourceCode: https://github.com/TUO-USERNAME/live_tempo
+IssueTracker: https://github.com/TUO-USERNAME/live_tempo/issues
+
+AutoName: LiveTempo
+Summary: Gestisci playlist e BPM per performance live
+Description: |
+  LiveTempo ti aiuta a gestire le tue playlist di canzoni con i BPM
+  di riferimento per le performance dal vivo. Prima di ogni canzone,
+  controlla il BPM per impostare il tempo corretto.
+
+  Funzionalita':
+  - Accedi con Google
+  - Crea playlist di canzoni
+  - Associa un BPM a ogni canzone
+  - Tap Tempo per calcolare il BPM battendo il ritmo
+  - BPM color-coded: lenti (blu), medi (verde), veloci (arancione)
+  - Dark theme ottimizzato per ambienti live
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.0.0
+CurrentVersionCode: 1
+
+RepoType: git
+Repo: https://github.com/TUO-USERNAME/live_tempo.git
+
+Builds:
+  - versionName: '1.0.0'
+    versionCode: 1
+    commit: v1.0.0
+    subdir: .
+    gradle:
+      - yes
+    srclibs:
+      - Capacitor@v7.2.1
+    prebuild:
+      - npm ci
+      - npx cap sync android
+    scanignore:
+      - android/app/src/main/assets/public

@@ -1,0 +1,16 @@
+{
+  "name": "livetempo",
+  "version": "1.0.0",
+  "description": "Gestisci playlist di canzoni con BPM per performance live",
+  "private": true,
+  "scripts": {
+    "cap:sync": "npx cap sync",
+    "cap:open": "npx cap open android",
+    "cap:add": "npx cap add android"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.2.1",
+    "@capacitor/android": "^7.2.1",
+    "@capacitor/core": "^7.2.1"
+  }
+}
