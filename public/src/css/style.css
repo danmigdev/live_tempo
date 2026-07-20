@@ -602,18 +602,16 @@ input, button { font-family: inherit; }
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(0, 0, 0, 0.85);
+  background: #121212;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   transition: background 0.08s;
 }
 
 .bpm-pulse-overlay.bg-flash {
-  background: rgba(255, 183, 77, 0.15);
+  background: #1a1510;
 }
 
 .bpm-pulse-circle {
