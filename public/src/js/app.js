@@ -190,6 +190,7 @@ var App = {
     var beatBar = document.getElementById('bpm-pulse-beat');
 
     valueEl.textContent = song.bpm;
+    document.getElementById('bpm-pulse-title').textContent = song.title;
     var bpmClass = getBpmClass(song.bpm);
     circle.style.borderColor = 'var(--' + bpmClass + ')';
     valueEl.style.color = 'var(--' + bpmClass + ')';
