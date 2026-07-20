@@ -609,6 +609,11 @@ input, button { font-family: inherit; }
   justify-content: center;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  transition: background 0.08s;
+}
+
+.bpm-pulse-overlay.bg-flash {
+  background: rgba(255, 183, 77, 0.15);
 }
 
 .bpm-pulse-circle {

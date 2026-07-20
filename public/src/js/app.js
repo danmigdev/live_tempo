@@ -178,9 +178,13 @@ var App = {
 
     function flashBeat(beatIndex) {
       circle.classList.add('flash');
+      overlay.classList.add('bg-flash');
       var dots = beatBar.querySelectorAll('.bpm-pulse-beat-dot');
       dots.forEach(function (d, i) { d.classList.toggle('active', i === beatIndex); });
-      setTimeout(function () { circle.classList.remove('flash'); }, 80);
+      setTimeout(function () {
+        circle.classList.remove('flash');
+        overlay.classList.remove('bg-flash');
+      }, 100);
     }
 
     // Close on tap
