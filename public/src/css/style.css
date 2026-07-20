@@ -400,20 +400,24 @@ input, button { font-family: inherit; }
 
 /* --- Song move animation --- */
 .song-move-up {
-  animation: moveUp 0.4s ease-out;
+  animation: moveUp 0.5s ease-in-out;
 }
 .song-move-down {
-  animation: moveDown 0.4s ease-out;
+  animation: moveDown 0.5s ease-in-out;
 }
 @keyframes moveUp {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-8px); background: var(--bg-surface-hover); }
-  100% { transform: translateY(0); }
+  0% { transform: translateY(0); background: var(--bg-surface); }
+  20% { transform: translateY(-4px); }
+  50% { transform: translateY(-60px); background: var(--bg-surface-hover); }
+  80% { transform: translateY(-4px); }
+  100% { transform: translateY(0); background: var(--bg-surface); }
 }
 @keyframes moveDown {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(8px); background: var(--bg-surface-hover); }
-  100% { transform: translateY(0); }
+  0% { transform: translateY(0); background: var(--bg-surface); }
+  20% { transform: translateY(4px); }
+  50% { transform: translateY(60px); background: var(--bg-surface-hover); }
+  80% { transform: translateY(4px); }
+  100% { transform: translateY(0); background: var(--bg-surface); }
 }
 
 /* --- Song position number --- */
