@@ -98,6 +98,14 @@ var PlaylistDetailComponent = {
               <span class="song-drag-handle" title="Reorder">\
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="2"/><circle cx="15" cy="5" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="19" r="2"/><circle cx="15" cy="19" r="2"/></svg>\
               </span>\
+              <span class="song-reorder-btns">\
+                <button class="btn-icon btn-sm move-up-btn" data-id="' + song.id + '" title="Move up" aria-label="Move up">\
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>\
+                </button>\
+                <button class="btn-icon btn-sm move-down-btn" data-id="' + song.id + '" title="Move down" aria-label="Move down">\
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>\
+                </button>\
+              </span>\
             </div>\
           </div>';
       }).join('');
@@ -129,18 +137,32 @@ var PlaylistDetailComponent = {
         });
       });
 
-      // Song tap → BPM pulse (skip if was a drag)
+      // Song tap → BPM pulse
       container.querySelectorAll('.song-item').forEach(function (item) {
         item.addEventListener('click', function (e) {
           if (self.wasDrag) return;
-          if (e.target.closest('.song-actions') || e.target.closest('.song-drag-handle')) return;
+          if (e.target.closest('.song-actions') || e.target.closest('.song-drag-handle') || e.target.closest('.song-reorder-btns')) return;
           var songId = this.dataset.id;
           var song = self.songs.find(function (s) { return s.id === songId; });
           if (song) App.showBpmPulse(song);
         });
       });
 
-      // Drag and drop
+      // Move up/down buttons
+      container.querySelectorAll('.move-up-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          self.moveSong(this.dataset.id, -1);
+        });
+      });
+      container.querySelectorAll('.move-down-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          self.moveSong(this.dataset.id, 1);
+        });
+      });
+
+      // Drag and drop (desktop)
       this.setupDragAndDrop(container);
     }
 
@@ -264,6 +286,31 @@ var PlaylistDetailComponent = {
     });
     document.addEventListener('pointermove', onPointerMove);
     document.addEventListener('pointerup', onPointerUp);
+  },
+
+  moveSong: function (songId, direction) {
+    var index = -1;
+    for (var i = 0; i < this.songs.length; i++) {
+      if (this.songs[i].id === songId) { index = i; break; }
+    }
+    if (index === -1) return;
+    var newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= this.songs.length) return;
+
+    // Swap
+    var tmp = this.songs[index];
+    this.songs[index] = this.songs[newIndex];
+    this.songs[newIndex] = tmp;
+
+    // Update Firestore
+    var batch = db.batch();
+    batch.update(db.collection('songs').doc(this.songs[index].id), { order: index });
+    batch.update(db.collection('songs').doc(this.songs[newIndex].id), { order: newIndex });
+    batch.commit().catch(function (error) {
+      console.error('Move error:', error);
+    });
+
+    this.render();
   },
 
   updateSongOrder: function (items) {

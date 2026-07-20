@@ -427,6 +427,21 @@ input, button { font-family: inherit; }
 }
 .song-drag-handle:active { cursor: grabbing; color: var(--accent); }
 
+/* --- Reorder buttons --- */
+.song-reorder-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.song-reorder-btns .btn-icon {
+  padding: 2px;
+  color: var(--text-muted);
+}
+.song-reorder-btns .btn-icon:hover { color: var(--accent); }
+.song-reorder-btns .btn-icon:active { color: var(--accent); }
+
 /* --- Drag placeholder --- */
 .song-placeholder {
   border: 2px dashed var(--accent);
