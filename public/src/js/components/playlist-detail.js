@@ -184,6 +184,7 @@ var PlaylistDetailComponent = {
   },
 
   moveSong: function (songId, direction) {
+    var self = this;
     var index = -1;
     for (var i = 0; i < this.songs.length; i++) {
       if (this.songs[i].id === songId) { index = i; break; }
@@ -192,14 +193,12 @@ var PlaylistDetailComponent = {
     var newIndex = index + direction;
     if (newIndex < 0 || newIndex >= this.songs.length) return;
 
-    // Animate the moving item
-    var item = document.querySelector('.song-item[data-id="' + songId + '"]');
-    if (item) {
-      item.classList.add(direction < 0 ? 'song-move-up' : 'song-move-down');
-      setTimeout(function () { item.classList.remove('song-move-up', 'song-move-down'); }, 250);
-    }
+    var swipeItem = document.querySelector('.song-item[data-id="' + songId + '"]');
+    var otherId = this.songs[newIndex].id;
+    var otherItem = document.querySelector('.song-item[data-id="' + otherId + '"]');
+    var itemHeight = swipeItem ? swipeItem.offsetHeight + 8 : 70;
 
-    // Swap
+    // Swap in data model
     var tmp = this.songs[index];
     this.songs[index] = this.songs[newIndex];
     this.songs[newIndex] = tmp;
@@ -208,11 +207,30 @@ var PlaylistDetailComponent = {
     var batch = db.batch();
     batch.update(db.collection('songs').doc(this.songs[index].id), { order: index });
     batch.update(db.collection('songs').doc(this.songs[newIndex].id), { order: newIndex });
-    batch.commit().catch(function (error) {
-      console.error('Move error:', error);
-    });
+    batch.commit().catch(function () {});
 
-    this.render();
+    // Animate: slide both items
+    if (swipeItem && otherItem) {
+      var dist = (newIndex - index) * itemHeight;
+      swipeItem.style.transition = 'transform 0.5s ease-in-out';
+      swipeItem.style.transform = 'translateY(' + dist + 'px)';
+      swipeItem.style.background = 'var(--bg-surface-hover)';
+      otherItem.style.transition = 'transform 0.5s ease-in-out';
+      otherItem.style.transform = 'translateY(' + (-dist) + 'px)';
+      otherItem.style.background = 'var(--bg-surface-hover)';
+
+      setTimeout(function () {
+        swipeItem.style.transition = '';
+        swipeItem.style.transform = '';
+        swipeItem.style.background = '';
+        otherItem.style.transition = '';
+        otherItem.style.transform = '';
+        otherItem.style.background = '';
+        self.render();
+      }, 500);
+    } else {
+      this.render();
+    }
   },
 
   show: function (playlistId, playlistName) {
