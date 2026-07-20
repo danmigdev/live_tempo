@@ -327,8 +327,10 @@ function showSubView(viewId) {
 
   var fab = document.getElementById('fab-add-song');
   if (fab) fab.remove();
-  var bar = document.getElementById('playlist-actions-bar');
-  if (bar) bar.remove();
+  var bar1 = document.getElementById('playlist-actions-bar');
+  if (bar1) bar1.remove();
+  var bar2 = document.getElementById('home-actions-bar');
+  if (bar2) bar2.remove();
 }
 
 function escapeHtml(str) {
