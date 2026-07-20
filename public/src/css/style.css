@@ -397,11 +397,23 @@ input, button { font-family: inherit; }
   box-shadow: var(--shadow);
 }
 .song-item:active { background: var(--bg-surface-hover); }
-.song-item.dragging {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.8);
-  opacity: 0.95;
-  transform: scale(1.02);
-  background: var(--bg-elevated);
+
+/* --- Song move animation --- */
+.song-move-up {
+  animation: moveUp 0.2s ease-out;
+}
+.song-move-down {
+  animation: moveDown 0.2s ease-out;
+}
+@keyframes moveUp {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); background: var(--bg-surface-hover); }
+  100% { transform: translateY(0); }
+}
+@keyframes moveDown {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(8px); background: var(--bg-surface-hover); }
+  100% { transform: translateY(0); }
 }
 
 /* --- Song position number --- */
@@ -414,18 +426,6 @@ input, button { font-family: inherit; }
   flex-shrink: 0;
   order: 0;
 }
-
-/* --- Drag handle --- */
-.song-drag-handle {
-  cursor: grab;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  padding: 4px;
-  flex-shrink: 0;
-  touch-action: none;
-}
-.song-drag-handle:active { cursor: grabbing; color: var(--accent); }
 
 /* --- Reorder buttons --- */
 .song-reorder-btns {

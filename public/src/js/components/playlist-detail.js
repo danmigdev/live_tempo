@@ -5,8 +5,6 @@ var PlaylistDetailComponent = {
   playlistName: '',
   songs: [],
   unsubscribe: null,
-  dragData: null,
-  wasDrag: false,
 
   init: function () {
     var self = this;
@@ -73,7 +71,7 @@ var PlaylistDetailComponent = {
       container.innerHTML = this.songs.map(function (song, index) {
         var bpmClass = getBpmClass(song.bpm);
         return '\
-          <div class="song-item" data-id="' + song.id + '" data-index="' + index + '" draggable="false">\
+          <div class="song-item" data-id="' + song.id + '" data-index="' + index + '">\
             <span class="song-pos">' + (index + 1) + '</span>\
             <div class="song-info">\
               <span class="song-title">' + escapeHtml(song.title) + '</span>\
@@ -95,9 +93,6 @@ var PlaylistDetailComponent = {
                   <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>\
                 </svg>\
               </button>\
-              <span class="song-drag-handle" title="Reorder">\
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="2"/><circle cx="15" cy="5" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="19" r="2"/><circle cx="15" cy="19" r="2"/></svg>\
-              </span>\
               <span class="song-reorder-btns">\
                 <button class="btn-icon btn-sm move-up-btn" data-id="' + song.id + '" title="Move up" aria-label="Move up">\
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>\
@@ -110,7 +105,7 @@ var PlaylistDetailComponent = {
           </div>';
       }).join('');
 
-      // Wire up buttons
+      // Edit buttons
       container.querySelectorAll('.edit-song-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -120,6 +115,7 @@ var PlaylistDetailComponent = {
         });
       });
 
+      // Delete buttons
       container.querySelectorAll('.delete-song-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -137,11 +133,10 @@ var PlaylistDetailComponent = {
         });
       });
 
-      // Song tap → BPM pulse
+      // Song tap -> BPM pulse
       container.querySelectorAll('.song-item').forEach(function (item) {
         item.addEventListener('click', function (e) {
-          if (self.wasDrag) return;
-          if (e.target.closest('.song-actions') || e.target.closest('.song-drag-handle') || e.target.closest('.song-reorder-btns')) return;
+          if (e.target.closest('.song-actions') || e.target.closest('.song-reorder-btns')) return;
           var songId = this.dataset.id;
           var song = self.songs.find(function (s) { return s.id === songId; });
           if (song) App.showBpmPulse(song);
@@ -161,9 +156,6 @@ var PlaylistDetailComponent = {
           self.moveSong(this.dataset.id, 1);
         });
       });
-
-      // Drag and drop (desktop)
-      this.setupDragAndDrop(container);
     }
 
     // Bottom action bar
@@ -191,103 +183,6 @@ var PlaylistDetailComponent = {
     }
   },
 
-  setupDragAndDrop: function (container) {
-    var self = this;
-    var items = container.querySelectorAll('.song-item');
-    var draggedEl = null;
-    var draggedIndex = -1;
-    var placeholder = null;
-    var touchY = 0;
-
-    function createPlaceholder() {
-      var el = document.createElement('div');
-      el.className = 'song-placeholder';
-      return el;
-    }
-
-    function onPointerDown(e) {
-      var handle = e.target.closest('.song-drag-handle');
-      if (!handle) return;
-      e.preventDefault();
-      self.wasDrag = false;
-      draggedEl = e.target.closest('.song-item');
-      if (!draggedEl) return;
-      draggedIndex = Array.from(container.children).indexOf(draggedEl);
-
-      placeholder = createPlaceholder();
-      placeholder.style.height = draggedEl.offsetHeight + 'px';
-      container.insertBefore(placeholder, draggedEl);
-      draggedEl.classList.add('dragging');
-      draggedEl.style.position = 'fixed';
-      draggedEl.style.zIndex = '100';
-      draggedEl.style.left = draggedEl.getBoundingClientRect().left + 'px';
-      draggedEl.style.width = draggedEl.offsetWidth + 'px';
-      touchY = e.clientY;
-      draggedEl.setPointerCapture(e.pointerId);
-    }
-
-    function onPointerMove(e) {
-      if (!draggedEl) return;
-      self.wasDrag = true;
-      var dy = e.clientY - touchY;
-      draggedEl.style.top = (draggedEl.getBoundingClientRect().top + dy) + 'px';
-      touchY = e.clientY;
-
-      // Find closest item to swap placeholder
-      var allItems = Array.from(container.querySelectorAll('.song-item:not(.dragging)'));
-      var targetItem = null;
-      var minDist = Infinity;
-      allItems.forEach(function (item) {
-        var rect = item.getBoundingClientRect();
-        var midY = rect.top + rect.height / 2;
-        var dist = Math.abs(e.clientY - midY);
-        if (dist < minDist && dist < rect.height) {
-          minDist = dist;
-          targetItem = item;
-        }
-      });
-
-      if (targetItem && placeholder.nextSibling !== targetItem) {
-        container.insertBefore(placeholder, targetItem);
-      } else if (!targetItem && e.clientY > allItems[allItems.length - 1]?.getBoundingClientRect().bottom) {
-        container.appendChild(placeholder);
-      }
-    }
-
-    function onPointerUp(e) {
-      if (!draggedEl) return;
-      draggedEl.classList.remove('dragging');
-      draggedEl.style.position = '';
-      draggedEl.style.zIndex = '';
-      draggedEl.style.left = '';
-      draggedEl.style.top = '';
-      draggedEl.style.width = '';
-
-      // Insert at placeholder position
-      if (placeholder && placeholder.parentNode) {
-        container.insertBefore(draggedEl, placeholder);
-        placeholder.remove();
-      }
-      placeholder = null;
-
-      // Calculate new order and update Firestore
-      var newItems = container.querySelectorAll('.song-item');
-      var newIndex = Array.from(newItems).indexOf(draggedEl);
-      if (newIndex !== draggedIndex) {
-        self.updateSongOrder(newItems);
-      }
-
-      draggedEl = null;
-      draggedIndex = -1;
-    }
-
-    items.forEach(function (item) {
-      item.addEventListener('pointerdown', onPointerDown);
-    });
-    document.addEventListener('pointermove', onPointerMove);
-    document.addEventListener('pointerup', onPointerUp);
-  },
-
   moveSong: function (songId, direction) {
     var index = -1;
     for (var i = 0; i < this.songs.length; i++) {
@@ -296,6 +191,13 @@ var PlaylistDetailComponent = {
     if (index === -1) return;
     var newIndex = index + direction;
     if (newIndex < 0 || newIndex >= this.songs.length) return;
+
+    // Animate the moving item
+    var item = document.querySelector('.song-item[data-id="' + songId + '"]');
+    if (item) {
+      item.classList.add(direction < 0 ? 'song-move-up' : 'song-move-down');
+      setTimeout(function () { item.classList.remove('song-move-up', 'song-move-down'); }, 250);
+    }
 
     // Swap
     var tmp = this.songs[index];
@@ -311,28 +213,6 @@ var PlaylistDetailComponent = {
     });
 
     this.render();
-  },
-
-  updateSongOrder: function (items) {
-    var self = this;
-    var updates = [];
-    items.forEach(function (item, index) {
-      var songId = item.dataset.id;
-      var song = self.songs.find(function (s) { return s.id === songId; });
-      if (song && song.order !== index) {
-        updates.push({ id: songId, order: index });
-      }
-    });
-
-    if (updates.length === 0) return;
-
-    var batch = db.batch();
-    updates.forEach(function (u) {
-      batch.update(db.collection('songs').doc(u.id), { order: u.order });
-    });
-    batch.commit().catch(function (error) {
-      console.error('Reorder error:', error);
-    });
   },
 
   show: function (playlistId, playlistName) {
