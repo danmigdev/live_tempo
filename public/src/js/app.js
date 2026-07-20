@@ -95,6 +95,33 @@ var App = {
       self.refreshUi();
     });
 
+    // Pulse font family
+    var pulseFontSelect = document.getElementById('pulse-font-family-select');
+    pulseFontSelect.addEventListener('change', function () {
+      localStorage.setItem('livetempo-pulse-font-family', this.value);
+      self.applyPulseFont(this.value);
+    });
+
+    // Pulse BPM size slider
+    var pulseBpmSlider = document.getElementById('pulse-bpm-size-slider');
+    var pulseBpmValue = document.getElementById('pulse-bpm-size-value');
+    pulseBpmSlider.addEventListener('input', function () {
+      var size = parseFloat(this.value);
+      pulseBpmValue.textContent = size.toFixed(1);
+      localStorage.setItem('livetempo-pulse-bpm-size', size);
+      document.documentElement.style.setProperty('--pulse-bpm-size', size + 'rem');
+    });
+
+    // Pulse title size slider
+    var pulseTitleSlider = document.getElementById('pulse-title-size-slider');
+    var pulseTitleValue = document.getElementById('pulse-title-size-value');
+    pulseTitleSlider.addEventListener('input', function () {
+      var size = parseFloat(this.value);
+      pulseTitleValue.textContent = size.toFixed(2);
+      localStorage.setItem('livetempo-pulse-title-size', size);
+      document.documentElement.style.setProperty('--pulse-title-size', size + 'rem');
+    });
+
     // Load saved font settings
     var savedSize = localStorage.getItem('livetempo-font-size') || '1.05';
     var savedFont = localStorage.getItem('livetempo-font-family') || 'system';
@@ -103,6 +130,19 @@ var App = {
     sizeValue.textContent = parseFloat(savedSize).toFixed(2);
     fontSelect.value = savedFont;
     this.applyFontFamily(savedFont);
+
+    // Load pulse settings
+    var savedPulseFont = localStorage.getItem('livetempo-pulse-font-family') || 'system';
+    var savedPulseBpm = localStorage.getItem('livetempo-pulse-bpm-size') || '5';
+    var savedPulseTitle = localStorage.getItem('livetempo-pulse-title-size') || '2';
+    pulseFontSelect.value = savedPulseFont;
+    pulseBpmSlider.value = parseFloat(savedPulseBpm);
+    pulseBpmValue.textContent = parseFloat(savedPulseBpm).toFixed(1);
+    pulseTitleSlider.value = parseFloat(savedPulseTitle);
+    pulseTitleValue.textContent = parseFloat(savedPulseTitle).toFixed(2);
+    this.applyPulseFont(savedPulseFont);
+    document.documentElement.style.setProperty('--pulse-bpm-size', savedPulseBpm + 'rem');
+    document.documentElement.style.setProperty('--pulse-title-size', savedPulseTitle + 'rem');
 
     // Logout button
     document.getElementById('btn-logout').addEventListener('click', function () {
@@ -189,8 +229,16 @@ var App = {
     var valueEl = document.getElementById('bpm-pulse-value');
     var beatBar = document.getElementById('bpm-pulse-beat');
 
-    valueEl.textContent = song.bpm;
+    // Show song number and title
+    var songs = PlaylistDetailComponent.songs;
+    var songIndex = -1;
+    for (var i = 0; i < songs.length; i++) {
+      if (songs[i].id === song.id) { songIndex = i; break; }
+    }
+    document.getElementById('bpm-pulse-num').textContent = songIndex >= 0 ? (songIndex + 1) : '';
     document.getElementById('bpm-pulse-title').textContent = song.title;
+    valueEl.textContent = song.bpm;
+
     var bpmClass = getBpmClass(song.bpm);
     circle.style.borderColor = 'var(--' + bpmClass + ')';
     valueEl.style.color = 'var(--' + bpmClass + ')';
@@ -268,8 +316,14 @@ var App = {
 
     function updatePulseSong(newSong) {
       currentPulseSong = newSong;
-      valueEl.textContent = newSong.bpm;
+      var songs = PlaylistDetailComponent.songs;
+      var idx = -1;
+      for (var i = 0; i < songs.length; i++) {
+        if (songs[i].id === newSong.id) { idx = i; break; }
+      }
+      document.getElementById('bpm-pulse-num').textContent = idx >= 0 ? (idx + 1) : '';
       document.getElementById('bpm-pulse-title').textContent = newSong.title;
+      valueEl.textContent = newSong.bpm;
       var cls = getBpmClass(newSong.bpm);
       circle.style.borderColor = 'var(--' + cls + ')';
       valueEl.style.color = 'var(--' + cls + ')';
@@ -368,6 +422,11 @@ var App = {
   applyFontFamily: function (font) {
     var cssFont = font === 'system' ? 'var(--font-system)' : font;
     document.documentElement.style.setProperty('--song-font-family', cssFont + ', sans-serif');
+  },
+
+  applyPulseFont: function (font) {
+    var cssFont = font === 'system' ? 'var(--font-system)' : font;
+    document.documentElement.style.setProperty('--pulse-font-family', cssFont + ', sans-serif');
   }
 };
 

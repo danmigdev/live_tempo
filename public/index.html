@@ -249,6 +249,7 @@
 
     <!-- BPM Pulse Overlay -->
     <div id="bpm-pulse" class="bpm-pulse-overlay hidden">
+      <div id="bpm-pulse-num" class="bpm-pulse-num"></div>
       <div id="bpm-pulse-title" class="bpm-pulse-title"></div>
       <div id="bpm-pulse-circle" class="bpm-pulse-circle">
         <span id="bpm-pulse-value" class="bpm-pulse-value"></span>
@@ -269,6 +270,7 @@
         </button>
       </div>
       <div class="modal-body">
+        <h4 class="settings-section-title">List</h4>
         <div class="form-group">
           <label>Font</label>
           <select id="font-family-select" class="form-input">
@@ -285,6 +287,29 @@
         <div class="form-group">
           <label>Font size: <span id="font-size-value">1.05</span>rem</label>
           <input type="range" id="font-size-slider" class="font-slider" min="0.7" max="2" step="0.05" value="1.05">
+        </div>
+
+        <h4 class="settings-section-title">Tempo view</h4>
+        <div class="form-group">
+          <label>Font</label>
+          <select id="pulse-font-family-select" class="form-input">
+            <option value="system">System default</option>
+            <option value="Roboto">Roboto</option>
+            <option value="Open Sans">Open Sans</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Lato">Lato</option>
+            <option value="Raleway">Raleway</option>
+            <option value="Georgia">Georgia</option>
+            <option value="monospace">Monospace</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>BPM size: <span id="pulse-bpm-size-value">5</span>rem</label>
+          <input type="range" id="pulse-bpm-size-slider" class="font-slider" min="2" max="12" step="0.5" value="5">
+        </div>
+        <div class="form-group">
+          <label>Title size: <span id="pulse-title-size-value">2</span>rem</label>
+          <input type="range" id="pulse-title-size-slider" class="font-slider" min="1" max="5" step="0.25" value="2">
         </div>
       </div>
     </div>
