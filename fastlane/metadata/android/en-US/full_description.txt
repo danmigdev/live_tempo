@@ -1,0 +1,16 @@
+LiveTempo helps musicians manage song playlists with reference BPMs for live performances. Before each song starts, check the BPM to set the correct tempo right from your phone.
+
+Features:
+- Sign in with Google to save your playlists in the cloud
+- Create and manage song playlists
+- Set a reference BPM for each song
+- Tap Tempo: tap to calculate BPM from any rhythm
+- Visual metronome pulse at the song's exact tempo
+- Full-screen tempo view with large BPM display, readable from meters away
+- Import playlists directly from YouTube
+- Drag-and-drop and button reorder for playlist management
+- Color-coded BPM badges (slow/medium/fast)
+- Dark theme optimized for stage environments
+- Customizable fonts and sizes for list and tempo views
+- MIDI Bluetooth controller support for hands-free song navigation
+- Multi-language: Italian and English

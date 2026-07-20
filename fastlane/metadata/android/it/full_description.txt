@@ -1,0 +1,16 @@
+LiveTempo aiuta i musicisti a gestire playlist di canzoni con BPM di riferimento per le performance live. Prima di ogni canzone, controlla il BPM per impostare il tempo corretto direttamente dal telefono.
+
+Funzionalita':
+- Accedi con Google per salvare le tue playlist nel cloud
+- Crea e gestisci playlist di canzoni
+- Imposta un BPM di riferimento per ogni canzone
+- Tap Tempo: calcola il BPM battendo il ritmo
+- Metronomo visivo che pulsa al tempo esatto della canzone
+- Vista tempo a schermo intero con BPM grande, leggibile a metri di distanza
+- Importa playlist direttamente da YouTube
+- Riordina le canzoni con pulsanti su/giu' e drag-and-drop
+- BPM colorati: lenti (blu), medi (verde), veloci (arancione)
+- Tema scuro ottimizzato per ambienti live
+- Font e dimensioni personalizzabili per lista e vista tempo
+- Supporto MIDI Bluetooth per navigare tra le canzoni a mani libere
+- Multilingua: italiano e inglese
