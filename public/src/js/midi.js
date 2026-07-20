@@ -10,35 +10,29 @@ var MidiController = {
   onPulse: null,
 
   init: function () {
-    // Check if Web MIDI is available
+    var self = this;
     if (!navigator.requestMIDIAccess) {
       console.log('Web MIDI not available');
       return;
     }
-  },
 
-  connect: function (onNext, onPrev, onPulse) {
-    var self = this;
-    this.onNext = onNext;
-    this.onPrev = onPrev;
-    this.onPulse = onPulse;
-
-    if (!navigator.requestMIDIAccess) {
-      showToast('Web MIDI not supported on this device', 'error');
-      return;
-    }
-
+    // Connect once and stay connected
     navigator.requestMIDIAccess({ sysex: false }).then(
       function (access) {
         self.access = access;
         self.setupDevices();
         access.onstatechange = function () { self.setupDevices(); };
       },
-      function (error) {
-        console.error('MIDI access denied:', error);
-        showToast('MIDI access denied. Check permissions.', 'error');
+      function () {
+        console.log('MIDI access denied');
       }
     );
+  },
+
+  connect: function (onNext, onPrev, onPulse) {
+    this.onNext = onNext;
+    this.onPrev = onPrev;
+    this.onPulse = onPulse;
   },
 
   setupDevices: function () {

@@ -6,6 +6,11 @@ var App = {
   currentPlaylistName: '',
   previousView: null,
   confirmCallback: null,
+  currentPulseSong: null,
+  currentPulseTimer: null,
+  currentPulseOverlay: null,
+  currentPulseCircle: null,
+  currentPulseValueEl: null,
 
   init: function () {
     var self = this;
@@ -20,6 +25,14 @@ var App = {
     SongFormComponent.init();
     TapTempoComponent.init();
     YoutubeImportComponent.init();
+
+    // Init MIDI once, set up navigation callbacks
+    MidiController.init();
+    MidiController.connect(
+      function () { self.midiNextSong(); },
+      function () { self.midiPrevSong(); },
+      function () { self.midiOpenCurrent(); }
+    );
 
     // Modal backdrop closes modals
     document.getElementById('modal-backdrop').addEventListener('click', function () {
@@ -275,6 +288,13 @@ var App = {
       flashBeat(beats % 4);
     }, intervalMs);
 
+    // Keep reference for MIDI
+    self.currentPulseSong = song;
+    self.currentPulseTimer = timer;
+    self.currentPulseOverlay = overlay;
+    self.currentPulseCircle = circle;
+    self.currentPulseValueEl = valueEl;
+
     function flashBeat(beatIndex) {
       circle.classList.add('flash');
       overlay.classList.add('bg-flash');
@@ -286,54 +306,15 @@ var App = {
       }, 100);
     }
 
-    // MIDI navigation (previous / next song)
+    // Store current pulse song for MIDI navigation
     var currentPulseSong = song;
-    MidiController.connect(
-      function () { // next
-        var songs = PlaylistDetailComponent.songs;
-        var idx = -1;
-        for (var i = 0; i < songs.length; i++) {
-          if (songs[i].id === currentPulseSong.id) { idx = i; break; }
-        }
-        if (idx < songs.length - 1) {
-          currentPulseSong = songs[idx + 1];
-          updatePulseSong(currentPulseSong);
-        }
-      },
-      function () { // prev
-        var songs = PlaylistDetailComponent.songs;
-        var idx = -1;
-        for (var i = 0; i < songs.length; i++) {
-          if (songs[i].id === currentPulseSong.id) { idx = i; break; }
-        }
-        if (idx > 0) {
-          currentPulseSong = songs[idx - 1];
-          updatePulseSong(currentPulseSong);
-        }
-      },
-      function () { /* pulse - noop, already showing */ }
-    );
-
-    function updatePulseSong(newSong) {
-      currentPulseSong = newSong;
-      var songs = PlaylistDetailComponent.songs;
-      var idx = -1;
-      for (var i = 0; i < songs.length; i++) {
-        if (songs[i].id === newSong.id) { idx = i; break; }
-      }
-      document.getElementById('bpm-pulse-num').textContent = idx >= 0 ? (idx + 1) : '';
-      document.getElementById('bpm-pulse-title').textContent = newSong.title;
-      valueEl.textContent = newSong.bpm;
-      var cls = getBpmClass(newSong.bpm);
-      circle.style.borderColor = 'var(--' + cls + ')';
-      valueEl.style.color = 'var(--' + cls + ')';
-    }
+    self.currentPulseSong = song;
 
     // Close on tap
     overlay.onclick = function (e) {
       if (e.target === overlay) {
         clearInterval(timer);
-        MidiController.disconnect();
+        self.currentPulseSong = null;
         overlay.classList.add('hidden');
       }
     };
@@ -341,7 +322,6 @@ var App = {
     // Double-tap circle to edit
     circle.ondblclick = function () {
       clearInterval(timer);
-      MidiController.disconnect();
       overlay.classList.add('hidden');
       self.showSongForm(PlaylistDetailComponent.playlistId, currentPulseSong);
     };
@@ -427,6 +407,75 @@ var App = {
   applyPulseFont: function (font) {
     var cssFont = font === 'system' ? 'var(--font-system)' : font;
     document.documentElement.style.setProperty('--pulse-font-family', cssFont + ', sans-serif');
+  },
+
+  // MIDI navigation
+  midiNextSong: function () {
+    var songs = PlaylistDetailComponent.songs;
+    if (!songs.length) return;
+    // If pulse view is open, navigate within it
+    if (this.currentPulseSong && this.currentPulseOverlay && !this.currentPulseOverlay.classList.contains('hidden')) {
+      var idx = -1;
+      for (var i = 0; i < songs.length; i++) {
+        if (songs[i].id === this.currentPulseSong.id) { idx = i; break; }
+      }
+      if (idx < songs.length - 1) {
+        this.currentPulseSong = songs[idx + 1];
+        this.updatePulseDisplay();
+      }
+    } else {
+      // Navigate from list view: open next song's pulse
+      if (!this.currentPlaylistId) return;
+      var startIdx = this.currentPulseSong ? songs.findIndex(function(s) { return s.id === this.currentPulseSong.id; }.bind(this)) : -1;
+      var nextIdx = startIdx + 1;
+      if (nextIdx >= songs.length) nextIdx = 0;
+      this.currentPulseSong = songs[nextIdx];
+      this.showBpmPulse(songs[nextIdx]);
+    }
+  },
+
+  midiPrevSong: function () {
+    var songs = PlaylistDetailComponent.songs;
+    if (!songs.length) return;
+    if (this.currentPulseSong && this.currentPulseOverlay && !this.currentPulseOverlay.classList.contains('hidden')) {
+      var idx = -1;
+      for (var i = 0; i < songs.length; i++) {
+        if (songs[i].id === this.currentPulseSong.id) { idx = i; break; }
+      }
+      if (idx > 0) {
+        this.currentPulseSong = songs[idx - 1];
+        this.updatePulseDisplay();
+      }
+    } else {
+      if (!this.currentPlaylistId) return;
+      var startIdx = this.currentPulseSong ? songs.findIndex(function(s) { return s.id === this.currentPulseSong.id; }.bind(this)) : songs.length;
+      var prevIdx = startIdx - 1;
+      if (prevIdx < 0) prevIdx = songs.length - 1;
+      this.currentPulseSong = songs[prevIdx];
+      this.showBpmPulse(songs[prevIdx]);
+    }
+  },
+
+  midiOpenCurrent: function () {
+    if (this.currentPulseSong) {
+      this.showBpmPulse(this.currentPulseSong);
+    }
+  },
+
+  updatePulseDisplay: function () {
+    var song = this.currentPulseSong;
+    if (!song || !this.currentPulseOverlay) return;
+    var songs = PlaylistDetailComponent.songs;
+    var idx = -1;
+    for (var i = 0; i < songs.length; i++) {
+      if (songs[i].id === song.id) { idx = i; break; }
+    }
+    document.getElementById('bpm-pulse-num').textContent = idx >= 0 ? (idx + 1) : '';
+    document.getElementById('bpm-pulse-title').textContent = song.title;
+    this.currentPulseValueEl.textContent = song.bpm;
+    var cls = getBpmClass(song.bpm);
+    this.currentPulseCircle.style.borderColor = 'var(--' + cls + ')';
+    this.currentPulseValueEl.style.color = 'var(--' + cls + ')';
   }
 };
 
