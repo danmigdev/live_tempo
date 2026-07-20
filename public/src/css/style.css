@@ -25,6 +25,9 @@
   --shadow: 0 2px 8px rgba(0,0,0,0.4);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --song-font-family: var(--font-system);
+  --song-font-size: 1.05rem;
 }
 
 /* --- Reset & Base --- */
@@ -410,7 +413,8 @@ input, button { font-family: inherit; }
 
 /* --- Song position number --- */
 .song-pos {
-  font-size: var(--song-font-size, 1.05rem);
+  font-family: var(--song-font-family);
+  font-size: var(--song-font-size);
   font-weight: 700;
   color: var(--accent);
   min-width: 26px;
@@ -449,7 +453,8 @@ input, button { font-family: inherit; }
 }
 
 .song-title {
-  font-size: var(--song-font-size, 1.05rem);
+  font-family: var(--song-font-family);
+  font-size: var(--song-font-size);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -734,9 +739,26 @@ input, button { font-family: inherit; }
 }
 
 /* --- Settings --- */
-.settings-options {
-  display: flex;
-  gap: 8px;
+.font-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+  margin-top: 8px;
+  accent-color: var(--accent);
+}
+
+.font-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
 }
 
 /* --- Toast --- */

@@ -75,20 +75,32 @@ var App = {
       self.hideSettings();
     });
 
-    // Font size options
-    document.querySelectorAll('#font-size-options .btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var size = this.dataset.size;
-        localStorage.setItem('livetempo-font-size', size);
-        document.documentElement.style.setProperty('--song-font-size', size + 'rem');
-        self.highlightFontSize(size);
-      });
+    // Font family selector
+    var fontSelect = document.getElementById('font-family-select');
+    fontSelect.addEventListener('change', function () {
+      var font = this.value;
+      localStorage.setItem('livetempo-font-family', font);
+      self.applyFontFamily(font);
     });
 
-    // Load saved font size
+    // Font size slider
+    var sizeSlider = document.getElementById('font-size-slider');
+    var sizeValue = document.getElementById('font-size-value');
+    sizeSlider.addEventListener('input', function () {
+      var size = parseFloat(this.value);
+      sizeValue.textContent = size.toFixed(2);
+      localStorage.setItem('livetempo-font-size', size);
+      document.documentElement.style.setProperty('--song-font-size', size + 'rem');
+    });
+
+    // Load saved font settings
     var savedSize = localStorage.getItem('livetempo-font-size') || '1.05';
+    var savedFont = localStorage.getItem('livetempo-font-family') || 'system';
     document.documentElement.style.setProperty('--song-font-size', savedSize + 'rem');
-    this.highlightFontSize(savedSize);
+    sizeSlider.value = parseFloat(savedSize);
+    sizeValue.textContent = parseFloat(savedSize).toFixed(2);
+    fontSelect.value = savedFont;
+    this.applyFontFamily(savedFont);
 
     // Logout button
     document.getElementById('btn-logout').addEventListener('click', function () {
@@ -302,11 +314,9 @@ var App = {
     document.getElementById('modal-settings').classList.add('hidden');
   },
 
-  highlightFontSize: function (size) {
-    document.querySelectorAll('#font-size-options .btn').forEach(function (btn) {
-      btn.classList.toggle('btn-primary', btn.dataset.size === size);
-      btn.classList.toggle('btn-outline', btn.dataset.size !== size);
-    });
+  applyFontFamily: function (font) {
+    var cssFont = font === 'system' ? 'var(--font-system)' : font;
+    document.documentElement.style.setProperty('--song-font-family', cssFont + ', sans-serif');
   }
 };
 

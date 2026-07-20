@@ -268,12 +268,21 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>Font size</label>
-          <div class="settings-options" id="font-size-options">
-            <button class="btn btn-outline btn-sm" data-size="0.85">Small</button>
-            <button class="btn btn-outline btn-sm" data-size="1.05">Medium</button>
-            <button class="btn btn-outline btn-sm" data-size="1.3">Large</button>
-          </div>
+          <label>Font</label>
+          <select id="font-family-select" class="form-input">
+            <option value="system">System default</option>
+            <option value="Roboto">Roboto</option>
+            <option value="Open Sans">Open Sans</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Lato">Lato</option>
+            <option value="Raleway">Raleway</option>
+            <option value="Georgia">Georgia</option>
+            <option value="monospace">Monospace</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Font size: <span id="font-size-value">1.05</span>rem</label>
+          <input type="range" id="font-size-slider" class="font-slider" min="0.7" max="2" step="0.05" value="1.05">
         </div>
       </div>
     </div>
@@ -303,7 +312,7 @@
   <!-- Service Worker registration -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=3').catch(function () {});
+      navigator.serviceWorker.register('/sw.js?v=4').catch(function () {});
     }
   </script>
 </body>
