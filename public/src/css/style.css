@@ -400,10 +400,10 @@ input, button { font-family: inherit; }
 
 /* --- Song move animation --- */
 .song-move-up {
-  animation: moveUp 0.2s ease-out;
+  animation: moveUp 0.4s ease-out;
 }
 .song-move-down {
-  animation: moveDown 0.2s ease-out;
+  animation: moveDown 0.4s ease-out;
 }
 @keyframes moveUp {
   0% { transform: translateY(0); }
