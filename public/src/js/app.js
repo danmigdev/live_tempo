@@ -81,9 +81,10 @@ var App = {
       var font = this.value;
       localStorage.setItem('livetempo-font-family', font);
       self.applyFontFamily(font);
+      self.refreshUi();
     });
 
-    // Font size slider
+    // Font size slider (real-time update)
     var sizeSlider = document.getElementById('font-size-slider');
     var sizeValue = document.getElementById('font-size-value');
     sizeSlider.addEventListener('input', function () {
@@ -91,6 +92,7 @@ var App = {
       sizeValue.textContent = size.toFixed(2);
       localStorage.setItem('livetempo-font-size', size);
       document.documentElement.style.setProperty('--song-font-size', size + 'rem');
+      self.refreshUi();
     });
 
     // Load saved font settings
