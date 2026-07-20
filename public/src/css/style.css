@@ -668,7 +668,6 @@ input, button { font-family: inherit; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: background 0.08s;
 }
 
 .bpm-pulse-overlay.bg-flash {
@@ -719,7 +718,6 @@ input, button { font-family: inherit; }
   border-radius: 50%;
   background: var(--bg-surface);
   border: 4px solid var(--accent);
-  transition: transform 0.08s, box-shadow 0.08s;
 }
 
 .bpm-pulse-circle.flash {
