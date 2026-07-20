@@ -387,15 +387,52 @@ input, button { font-family: inherit; }
 .song-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 10px;
+  padding: 12px 12px;
   background: var(--bg-surface);
   border-radius: var(--radius);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
   box-shadow: var(--shadow);
+  touch-action: none;
 }
 .song-item:active { background: var(--bg-surface-hover); }
+.song-item.dragging {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+  opacity: 0.95;
+  transform: scale(1.02);
+  background: var(--bg-elevated);
+}
+
+/* --- Song position number --- */
+.song-pos {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* --- Drag handle --- */
+.song-drag-handle {
+  cursor: grab;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  flex-shrink: 0;
+  touch-action: none;
+}
+.song-drag-handle:active { cursor: grabbing; color: var(--accent); }
+
+/* --- Drag placeholder --- */
+.song-placeholder {
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  margin: 4px 0;
+  background: rgba(255, 183, 77, 0.05);
+}
 
 .song-info { flex: 1; min-width: 0; }
 
