@@ -58,6 +58,8 @@ var I18n = {
       daysAgo: function(n) { return n + ' giorni fa'; },
       language: 'Lingua',
       confirmDeleteSong: 'Eliminare la canzone?',
+      importYtPlaylist: 'Importa playlist da YouTube',
+      importFromYt: 'Import from YouTube',
     },
     en: {
       appDescription: 'Manage your playlists and keep the right tempo for every song',
@@ -114,6 +116,8 @@ var I18n = {
       daysAgo: function(n) { return n + ' days ago'; },
       language: 'Language',
       confirmDeleteSong: 'Delete this song?',
+      importYtPlaylist: 'Import playlist from YouTube',
+      importFromYt: 'Import from YouTube',
     }
   },
 
