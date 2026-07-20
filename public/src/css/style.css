@@ -305,10 +305,34 @@ input, button { font-family: inherit; }
 
 .empty-actions {
   display: flex;
-  gap: 12px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
   margin-top: 20px;
-  flex-wrap: wrap;
+  width: 100%;
+}
+
+.empty-actions .btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* --- Home Actions Bar (below playlist cards) --- */
+.home-actions-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding-bottom: 80px;
+}
+
+.home-actions-bar .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* --- FAB (Floating Action Button) --- */
