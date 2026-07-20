@@ -406,10 +406,10 @@ input, button { font-family: inherit; }
 
 /* --- Song position number --- */
 .song-pos {
-  font-size: 0.8rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--text-muted);
-  min-width: 22px;
+  color: var(--text-primary);
+  min-width: 26px;
   text-align: center;
   flex-shrink: 0;
 }
