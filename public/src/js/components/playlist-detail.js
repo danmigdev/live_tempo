@@ -5,6 +5,7 @@ var PlaylistDetailComponent = {
   playlistName: '',
   songs: [],
   unsubscribe: null,
+  animating: false,
 
   init: function () {
     var self = this;
@@ -42,7 +43,7 @@ var PlaylistDetailComponent = {
     if (this.unsubscribe) this.unsubscribe();
     this.unsubscribe = subscribeSongs(playlistId, function (songs) {
       self.songs = songs;
-      self.render();
+      if (!self.animating) self.render();
     });
 
     document.getElementById('detail-playlist-name').textContent = playlistName;
@@ -193,42 +194,43 @@ var PlaylistDetailComponent = {
     var newIndex = index + direction;
     if (newIndex < 0 || newIndex >= this.songs.length) return;
 
-    var swipeItem = document.querySelector('.song-item[data-id="' + songId + '"]');
+    var item = document.querySelector('.song-item[data-id="' + songId + '"]');
     var otherId = this.songs[newIndex].id;
     var otherItem = document.querySelector('.song-item[data-id="' + otherId + '"]');
-    var itemHeight = swipeItem ? swipeItem.offsetHeight + 8 : 70;
 
     // Swap in data model
     var tmp = this.songs[index];
     this.songs[index] = this.songs[newIndex];
     this.songs[newIndex] = tmp;
 
-    // Update Firestore
+    // Update Firestore (listener will fire but render is blocked by animating flag)
+    this.animating = true;
     var batch = db.batch();
     batch.update(db.collection('songs').doc(this.songs[index].id), { order: index });
     batch.update(db.collection('songs').doc(this.songs[newIndex].id), { order: newIndex });
     batch.commit().catch(function () {});
 
-    // Animate: slide both items
-    if (swipeItem && otherItem) {
-      var dist = (newIndex - index) * itemHeight;
-      swipeItem.style.transition = 'transform 0.5s ease-in-out';
-      swipeItem.style.transform = 'translateY(' + dist + 'px)';
-      swipeItem.style.background = 'var(--bg-surface-hover)';
-      otherItem.style.transition = 'transform 0.5s ease-in-out';
+    // Animate both items sliding into each other's positions
+    if (item && otherItem) {
+      var gap = 9; // gap between items (8px from css gap + 1px)
+      var h = item.offsetHeight + gap;
+      var dist = (newIndex - index) * h;
+
+      item.style.transition = 'transform 0.5s ease-in-out, background 0.3s';
+      item.style.transform = 'translateY(' + dist + 'px)';
+      item.style.background = 'var(--bg-surface-hover)';
+      item.style.zIndex = '1';
+
+      otherItem.style.transition = 'transform 0.5s ease-in-out, background 0.3s';
       otherItem.style.transform = 'translateY(' + (-dist) + 'px)';
       otherItem.style.background = 'var(--bg-surface-hover)';
 
       setTimeout(function () {
-        swipeItem.style.transition = '';
-        swipeItem.style.transform = '';
-        swipeItem.style.background = '';
-        otherItem.style.transition = '';
-        otherItem.style.transform = '';
-        otherItem.style.background = '';
+        self.animating = false;
         self.render();
       }, 500);
     } else {
+      this.animating = false;
       this.render();
     }
   },
