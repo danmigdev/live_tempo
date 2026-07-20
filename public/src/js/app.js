@@ -35,6 +35,9 @@ var App = {
       if (!document.getElementById('modal-yt-import').classList.contains('hidden')) {
         YoutubeImportComponent.hide();
       }
+      if (!document.getElementById('modal-settings').classList.contains('hidden')) {
+        self.hideSettings();
+      }
     });
 
     // Playlist name modal events
@@ -63,6 +66,29 @@ var App = {
       }
       self.hideConfirmModal();
     });
+
+    // Settings
+    document.getElementById('btn-settings').addEventListener('click', function () {
+      self.showSettings();
+    });
+    document.getElementById('btn-close-settings').addEventListener('click', function () {
+      self.hideSettings();
+    });
+
+    // Font size options
+    document.querySelectorAll('#font-size-options .btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var size = this.dataset.size;
+        localStorage.setItem('livetempo-font-size', size);
+        document.documentElement.style.setProperty('--song-font-size', size + 'rem');
+        self.highlightFontSize(size);
+      });
+    });
+
+    // Load saved font size
+    var savedSize = localStorage.getItem('livetempo-font-size') || '1.05';
+    document.documentElement.style.setProperty('--song-font-size', savedSize + 'rem');
+    this.highlightFontSize(savedSize);
 
     // Logout button
     document.getElementById('btn-logout').addEventListener('click', function () {
@@ -263,6 +289,24 @@ var App = {
   hideConfirmModal: function () {
     document.getElementById('modal-backdrop').classList.add('hidden');
     document.getElementById('modal-confirm').classList.add('hidden');
+  },
+
+  // Settings
+  showSettings: function () {
+    document.getElementById('modal-backdrop').classList.remove('hidden');
+    document.getElementById('modal-settings').classList.remove('hidden');
+  },
+
+  hideSettings: function () {
+    document.getElementById('modal-backdrop').classList.add('hidden');
+    document.getElementById('modal-settings').classList.add('hidden');
+  },
+
+  highlightFontSize: function (size) {
+    document.querySelectorAll('#font-size-options .btn').forEach(function (btn) {
+      btn.classList.toggle('btn-primary', btn.dataset.size === size);
+      btn.classList.toggle('btn-outline', btn.dataset.size !== size);
+    });
   }
 };
 

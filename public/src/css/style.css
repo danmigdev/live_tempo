@@ -401,7 +401,7 @@ input, button { font-family: inherit; }
 
 /* --- Song position number --- */
 .song-pos {
-  font-size: 1.05rem;
+  font-size: var(--song-font-size, 1.05rem);
   font-weight: 700;
   color: var(--accent);
   min-width: 26px;
@@ -440,7 +440,7 @@ input, button { font-family: inherit; }
 }
 
 .song-title {
-  font-size: 1.05rem;
+  font-size: var(--song-font-size, 1.05rem);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -724,6 +724,13 @@ input, button { font-family: inherit; }
   padding: 12px;
 }
 
+/* --- Settings --- */
+.settings-options {
+  display: flex;
+  gap: 8px;
+}
+
+/* --- Toast --- */
 .toast-container {
   position: fixed;
   bottom: calc(24px + var(--safe-bottom));
