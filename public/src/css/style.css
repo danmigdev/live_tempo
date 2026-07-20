@@ -672,6 +672,17 @@ input, button { font-family: inherit; }
   background: #cc7a00;
 }
 
+.bpm-midi-status {
+  position: absolute;
+  bottom: 24px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding-bottom: var(--safe-bottom);
+}
+.bpm-midi-status.midi-connected {
+  color: var(--bpm-medium);
+}
+
 .bpm-pulse-title {
   font-size: 1.5rem;
   font-weight: 600;

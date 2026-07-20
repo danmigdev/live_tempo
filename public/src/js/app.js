@@ -205,6 +205,16 @@ var App = {
 
     overlay.classList.remove('hidden');
 
+    // Show MIDI status
+    var midiStatus = document.getElementById('bpm-midi-status');
+    if (MidiController.isConnected()) {
+      midiStatus.textContent = 'MIDI: ' + MidiController.getDeviceName();
+      midiStatus.className = 'bpm-midi-status midi-connected';
+    } else {
+      midiStatus.textContent = 'MIDI: not connected';
+      midiStatus.className = 'bpm-midi-status';
+    }
+
     // Start the metronome — runs infinitely until dismissed
     var intervalMs = 60000 / song.bpm;
     var beats = 0;
@@ -228,22 +238,60 @@ var App = {
       }, 100);
     }
 
+    // MIDI navigation (previous / next song)
+    var currentPulseSong = song;
+    MidiController.connect(
+      function () { // next
+        var songs = PlaylistDetailComponent.songs;
+        var idx = -1;
+        for (var i = 0; i < songs.length; i++) {
+          if (songs[i].id === currentPulseSong.id) { idx = i; break; }
+        }
+        if (idx < songs.length - 1) {
+          currentPulseSong = songs[idx + 1];
+          updatePulseSong(currentPulseSong);
+        }
+      },
+      function () { // prev
+        var songs = PlaylistDetailComponent.songs;
+        var idx = -1;
+        for (var i = 0; i < songs.length; i++) {
+          if (songs[i].id === currentPulseSong.id) { idx = i; break; }
+        }
+        if (idx > 0) {
+          currentPulseSong = songs[idx - 1];
+          updatePulseSong(currentPulseSong);
+        }
+      },
+      function () { /* pulse - noop, already showing */ }
+    );
+
+    function updatePulseSong(newSong) {
+      currentPulseSong = newSong;
+      valueEl.textContent = newSong.bpm;
+      document.getElementById('bpm-pulse-title').textContent = newSong.title;
+      var cls = getBpmClass(newSong.bpm);
+      circle.style.borderColor = 'var(--' + cls + ')';
+      valueEl.style.color = 'var(--' + cls + ')';
+    }
+
     // Close on tap
     overlay.onclick = function (e) {
       if (e.target === overlay) {
         clearInterval(timer);
+        MidiController.disconnect();
         overlay.classList.add('hidden');
       }
     };
 
-    // Close on double-tap circle to edit
+    // Double-tap circle to edit
     circle.ondblclick = function () {
       clearInterval(timer);
+      MidiController.disconnect();
       overlay.classList.add('hidden');
-      self.showSongForm(PlaylistDetailComponent.playlistId, song);
+      self.showSongForm(PlaylistDetailComponent.playlistId, currentPulseSong);
     };
 
-    // Edit via button
     circle.title = 'Double-tap to edit';
   },
 
