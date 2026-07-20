@@ -6,6 +6,7 @@ var PlaylistDetailComponent = {
   songs: [],
   unsubscribe: null,
   dragData: null,
+  wasDrag: false,
 
   init: function () {
     var self = this;
@@ -128,9 +129,10 @@ var PlaylistDetailComponent = {
         });
       });
 
-      // Song tap → BPM pulse
+      // Song tap → BPM pulse (skip if was a drag)
       container.querySelectorAll('.song-item').forEach(function (item) {
         item.addEventListener('click', function (e) {
+          if (self.wasDrag) return;
           if (e.target.closest('.song-actions') || e.target.closest('.song-drag-handle')) return;
           var songId = this.dataset.id;
           var song = self.songs.find(function (s) { return s.id === songId; });
@@ -185,6 +187,7 @@ var PlaylistDetailComponent = {
       var handle = e.target.closest('.song-drag-handle');
       if (!handle) return;
       e.preventDefault();
+      self.wasDrag = false;
       draggedEl = e.target.closest('.song-item');
       if (!draggedEl) return;
       draggedIndex = Array.from(container.children).indexOf(draggedEl);
@@ -203,6 +206,7 @@ var PlaylistDetailComponent = {
 
     function onPointerMove(e) {
       if (!draggedEl) return;
+      self.wasDrag = true;
       var dy = e.clientY - touchY;
       draggedEl.style.top = (draggedEl.getBoundingClientRect().top + dy) + 'px';
       touchY = e.clientY;
