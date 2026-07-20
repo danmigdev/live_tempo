@@ -386,15 +386,15 @@ input, button { font-family: inherit; }
 
 .song-item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 12px 12px;
   background: var(--bg-surface);
   border-radius: var(--radius);
   cursor: pointer;
   transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
   box-shadow: var(--shadow);
-  touch-action: none;
 }
 .song-item:active { background: var(--bg-surface-hover); }
 .song-item.dragging {
@@ -408,10 +408,11 @@ input, button { font-family: inherit; }
 .song-pos {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--accent);
   min-width: 26px;
   text-align: center;
   flex-shrink: 0;
+  order: 0;
 }
 
 /* --- Drag handle --- */
@@ -434,7 +435,11 @@ input, button { font-family: inherit; }
   background: rgba(255, 183, 77, 0.05);
 }
 
-.song-info { flex: 1; min-width: 0; }
+.song-info {
+  flex: 1 1 100%;
+  min-width: 0;
+  order: 1;
+}
 
 .song-title {
   font-size: 1.05rem;
@@ -443,6 +448,7 @@ input, button { font-family: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
+  padding-bottom: 4px;
 }
 
 /* --- BPM Badge --- */
@@ -455,6 +461,7 @@ input, button { font-family: inherit; }
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
+  order: 2;
 }
 
 .song-bpm-value {
@@ -491,6 +498,8 @@ input, button { font-family: inherit; }
   display: flex;
   gap: 2px;
   flex-shrink: 0;
+  order: 3;
+  margin-left: auto;
 }
 
 /* --- Modal --- */
