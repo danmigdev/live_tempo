@@ -34,27 +34,26 @@ jobs:
       - name: Build Capacitor web assets
         run: npx cap sync android
 
+      - name: Decode keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+          echo "RELEASE_KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+          echo "RELEASE_KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "RELEASE_KEY_ALIAS=${{ secrets.KEYSTORE_ALIAS }}" >> "$GITHUB_ENV"
+          echo "RELEASE_KEY_PASSWORD=${{ secrets.KEYSTORE_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+
       - name: Build Release APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew clean assembleRelease
 
-      - name: Sign Release APK
-        uses: r0adkll/sign-android-release@v1
-        id: sign_apk
-        with:
-          releaseDirectory: android/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE_BASE64 }}
-          alias: ${{ secrets.KEYSTORE_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-          buildToolsVersion: '35.0.0'
-
       - name: Prepare APK for release
         run: |
           mkdir -p release
-          cp android/app/build/outputs/apk/release/app-release-unsigned-signed.apk release/livetempo.apk
+          cp android/app/build/outputs/apk/release/app-release.apk release/livetempo.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
