@@ -1,0 +1,49 @@
+name: Diagnose Build Tool Versions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Capacitor web assets
+        run: npx cap sync android
+
+      - name: Build Release APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew clean assembleRelease --info > /tmp/gradle-info.log 2>&1 || true
+
+      - name: Resolved AAPT2 / D8 / R8 tool versions
+        run: |
+          echo "=== aapt2 artifacts in Gradle cache ==="
+          find ~/.gradle/caches -ipath "*aapt2*" \( -iname "*.jar" -o -iname "*.pom" \) 2>/dev/null | sort
+          echo
+          echo "=== r8 artifacts in Gradle cache ==="
+          find ~/.gradle/caches -ipath "*com.android.tools*r8*" -iname "*.jar" 2>/dev/null | sort
+          echo
+          echo "=== build-tools related lines from --info log ==="
+          grep -i "aapt2\|com.android.tools:r8\|com.android.tools.build:aapt2" /tmp/gradle-info.log | head -50
+          echo
+          echo "=== gradle -v ==="
+          cd android && ./gradlew -v
