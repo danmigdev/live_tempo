@@ -39,7 +39,6 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew clean assembleRelease
-        continue-on-error: true
 
       - name: Sign Release APK
         uses: r0adkll/sign-android-release@v1
@@ -50,24 +49,12 @@ jobs:
           alias: ${{ secrets.KEYSTORE_ALIAS }}
           keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-        continue-on-error: true
-
-      - name: Build Debug APK
-        run: |
-          cd android
-          ./gradlew assembleDebug
+          buildToolsVersion: '35.0.0'
 
       - name: Prepare APK for release
         run: |
           mkdir -p release
-          # Prefer signed release, fall back to debug (always installable)
-          if [ -f android/app/build/outputs/apk/release/app-release-unsigned-signed.apk ]; then
-            cp android/app/build/outputs/apk/release/app-release-unsigned-signed.apk release/livetempo.apk
-            echo "Using signed release APK"
-          else
-            cp android/app/build/outputs/apk/debug/app-debug.apk release/livetempo.apk
-            echo "Using debug APK (installable, for testing)"
-          fi
+          cp android/app/build/outputs/apk/release/app-release-unsigned-signed.apk release/livetempo.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
