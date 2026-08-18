@@ -1,6 +1,6 @@
 {
   "name": "livetempo",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Gestisci playlist di canzoni con BPM per performance live",
   "private": true,
   "scripts": {
