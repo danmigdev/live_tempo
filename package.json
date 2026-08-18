@@ -1,6 +1,6 @@
 {
   "name": "livetempo",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Manage song playlists with BPM references for live performances",
   "private": true,
   "scripts": {
