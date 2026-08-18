@@ -1,7 +1,7 @@
 {
   "name": "livetempo",
   "version": "1.0.3",
-  "description": "Gestisci playlist di canzoni con BPM per performance live",
+  "description": "Manage song playlists with BPM references for live performances",
   "private": true,
   "scripts": {
     "cap:sync": "npx cap sync",

@@ -1,7 +1,7 @@
 {
   "name": "LiveTempo",
   "short_name": "LiveTempo",
-  "description": "Gestisci playlist e BPM per performance live",
+  "description": "Manage song playlists and BPM for live performances",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#121212",
@@ -22,6 +22,6 @@
     }
   ],
   "categories": ["music", "utilities"],
-  "lang": "it",
+  "lang": "en",
   "dir": "ltr"
 }
