@@ -5,10 +5,23 @@ var I18n = {
   strings: {
     it: {
       appDescription: 'Gestisci le tue playlist e tieni il tempo giusto per ogni canzone',
-      signInGoogle: 'Accedi con Google',
+      emailLabel: 'Email',
+      passwordLabel: 'Password',
+      signIn: 'Accedi',
+      signUp: 'Registrati',
       signingIn: 'Accesso in corso...',
       signOut: 'Esci',
+      needAccount: 'Non hai un account? Registrati',
+      haveAccount: 'Hai già un account? Accedi',
+      forgotPassword: 'Password dimenticata?',
+      resetEmailSent: 'Email per il reset della password inviata',
       loginError: 'Errore durante l\'accesso. Riprova.',
+      errorInvalidEmail: 'Indirizzo email non valido',
+      errorWeakPassword: 'La password deve avere almeno 6 caratteri',
+      errorWrongPassword: 'Email o password errati',
+      errorUserNotFound: 'Nessun account trovato con questa email',
+      errorEmailInUse: 'Esiste già un account con questa email',
+      errorFillFields: 'Inserisci email e password',
       myPlaylists: 'Le mie Playlist',
       noPlaylists: 'Nessuna playlist',
       noPlaylistsHint: 'Crea la tua prima playlist per iniziare',
@@ -63,10 +76,23 @@ var I18n = {
     },
     en: {
       appDescription: 'Manage your playlists and keep the right tempo for every song',
-      signInGoogle: 'Sign in with Google',
+      emailLabel: 'Email',
+      passwordLabel: 'Password',
+      signIn: 'Sign in',
+      signUp: 'Sign up',
       signingIn: 'Signing in...',
       signOut: 'Sign out',
+      needAccount: 'Need an account? Sign up',
+      haveAccount: 'Already have an account? Sign in',
+      forgotPassword: 'Forgot password?',
+      resetEmailSent: 'Password reset email sent',
       loginError: 'Login error. Please try again.',
+      errorInvalidEmail: 'Invalid email address',
+      errorWeakPassword: 'Password must be at least 6 characters',
+      errorWrongPassword: 'Wrong email or password',
+      errorUserNotFound: 'No account found with this email',
+      errorEmailInUse: 'An account with this email already exists',
+      errorFillFields: 'Enter your email and password',
       myPlaylists: 'My Playlists',
       noPlaylists: 'No playlists',
       noPlaylistsHint: 'Create your first playlist to get started',
@@ -125,6 +151,9 @@ var I18n = {
     var saved = localStorage.getItem('livetempo-lang');
     if (saved && (saved === 'it' || saved === 'en')) {
       this.lang = saved;
+    } else {
+      var deviceLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'en').toLowerCase();
+      this.lang = deviceLang.indexOf('it') === 0 ? 'it' : 'en';
     }
     this.apply();
     this.initSelector();

@@ -148,13 +148,15 @@ input, button { font-family: inherit; }
 .btn:active { transform: scale(0.97); }
 .btn:disabled { opacity: 0.5; pointer-events: none; }
 
-.btn-google {
-  background: #fff;
-  color: #333;
-  width: 100%;
-  box-shadow: var(--shadow);
+.login-form .btn { width: 100%; }
+
+.login-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
 }
-.btn-google:hover { background: #f0f0f0; }
 
 .btn-primary {
   background: var(--accent);

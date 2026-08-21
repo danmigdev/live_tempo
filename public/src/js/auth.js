@@ -13,42 +13,35 @@ function notifyAuthChange(user) {
   authCallbacks.forEach(function (cb) { cb(user); });
 }
 
+function userFromFirebase(user) {
+  return {
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName,
+    photoURL: user.photoURL
+  };
+}
+
 // Init auth state listener
 auth.onAuthStateChanged(function (user) {
   authReady = true;
-  if (user) {
-    currentUser = {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL
-    };
-  } else {
-    currentUser = null;
-  }
+  currentUser = user ? userFromFirebase(user) : null;
   notifyAuthChange(currentUser);
 });
 
-// Google Sign-In
-function signInWithGoogle() {
-  var provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  return auth.signInWithPopup(provider)
-    .then(function (result) {
-      return {
-        uid: result.user.uid,
-        email: result.user.email,
-        displayName: result.user.displayName,
-        photoURL: result.user.photoURL
-      };
-    })
-    .catch(function (error) {
-      if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-        console.error('Google sign-in error:', error);
-        throw error;
-      }
-      return null;
-    });
+// Email/password auth
+function signUpWithEmail(email, password) {
+  return auth.createUserWithEmailAndPassword(email, password)
+    .then(function (result) { return userFromFirebase(result.user); });
+}
+
+function signInWithEmail(email, password) {
+  return auth.signInWithEmailAndPassword(email, password)
+    .then(function (result) { return userFromFirebase(result.user); });
+}
+
+function sendPasswordReset(email) {
+  return auth.sendPasswordResetEmail(email);
 }
 
 // Sign out
