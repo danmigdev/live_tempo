@@ -6,9 +6,10 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
     match /songs/{songId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+      allow read, update, delete: if request.auth != null &&
+        get(/databases/$(database)/documents/playlists/$(resource.data.playlistId)).data.userId == request.auth.uid;
+      allow create: if request.auth != null &&
+        get(/databases/$(database)/documents/playlists/$(request.resource.data.playlistId)).data.userId == request.auth.uid;
     }
   }
 }
