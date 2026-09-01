@@ -57,6 +57,7 @@ var PlaylistDetailComponent = {
   },
 
   render: function () {
+    var self = this;
     var container = document.getElementById('song-list');
     var emptyEl = document.getElementById('empty-songs');
     var countEl = document.getElementById('detail-song-count');
@@ -68,7 +69,6 @@ var PlaylistDetailComponent = {
       emptyEl.classList.remove('hidden');
     } else {
       emptyEl.classList.add('hidden');
-      var self = this;
       container.innerHTML = this.songs.map(function (song, index) {
         var bpmClass = getBpmClass(song.bpm);
         return '\
