@@ -4,13 +4,17 @@
   "description": "Manage song playlists with BPM references for live performances",
   "private": true,
   "scripts": {
+    "postinstall": "node scripts/copy-firebase.js",
     "cap:sync": "npx cap sync",
     "cap:open": "npx cap open android",
     "cap:add": "npx cap add android"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.2.1",
     "@capacitor/android": "^7.2.1",
+    "@capacitor/cli": "^7.2.1",
     "@capacitor/core": "^7.2.1"
+  },
+  "dependencies": {
+    "firebase": "11.6.0"
   }
 }

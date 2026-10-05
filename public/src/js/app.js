@@ -169,6 +169,7 @@ var App = {
     onAuthChange(function (user) {
       self.handleAuthChange(user);
     });
+    initAuth();
   },
 
   refreshUi: function () {

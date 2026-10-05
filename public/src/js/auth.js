@@ -22,29 +22,32 @@ function userFromFirebase(user) {
   };
 }
 
-// Init auth state listener
-auth.onAuthStateChanged(function (user) {
-  authReady = true;
-  currentUser = user ? userFromFirebase(user) : null;
-  notifyAuthChange(currentUser);
-});
+// Start the auth state listener (FB is set up by firebase.js, a module that
+// runs after the classic scripts, so this is called from App.init)
+function initAuth() {
+  FB.onAuthStateChanged(FB.auth, function (user) {
+    authReady = true;
+    currentUser = user ? userFromFirebase(user) : null;
+    notifyAuthChange(currentUser);
+  });
+}
 
 // Email/password auth
 function signUpWithEmail(email, password) {
-  return auth.createUserWithEmailAndPassword(email, password)
+  return FB.createUserWithEmailAndPassword(FB.auth, email, password)
     .then(function (result) { return userFromFirebase(result.user); });
 }
 
 function signInWithEmail(email, password) {
-  return auth.signInWithEmailAndPassword(email, password)
+  return FB.signInWithEmailAndPassword(FB.auth, email, password)
     .then(function (result) { return userFromFirebase(result.user); });
 }
 
 function sendPasswordReset(email) {
-  return auth.sendPasswordResetEmail(email);
+  return FB.sendPasswordResetEmail(FB.auth, email);
 }
 
 // Sign out
 function signOutUser() {
-  return auth.signOut();
+  return FB.signOut(FB.auth);
 }

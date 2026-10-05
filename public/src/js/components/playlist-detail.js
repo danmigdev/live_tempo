@@ -199,9 +199,9 @@ var PlaylistDetailComponent = {
 
     // Update Firestore (listener will fire but render is blocked by animating flag)
     this.animating = true;
-    var batch = db.batch();
-    batch.update(db.collection('songs').doc(this.songs[index].id), { order: index });
-    batch.update(db.collection('songs').doc(this.songs[newIndex].id), { order: newIndex });
+    var batch = FB.writeBatch(FB.db);
+    batch.update(FB.doc(FB.db, 'songs', this.songs[index].id), { order: index });
+    batch.update(FB.doc(FB.db, 'songs', this.songs[newIndex].id), { order: newIndex });
     batch.commit().catch(function () {});
 
     // Animate both items sliding into each other's positions

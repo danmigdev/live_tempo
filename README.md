@@ -97,6 +97,9 @@ service cloud.firestore {
 ## Local Development
 
 ```bash
+# Install dependencies (also copies the Firebase SDK into public/vendor)
+npm install
+
 # Start a local server
 npx serve public
 # Or with Python
