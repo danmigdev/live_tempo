@@ -24,6 +24,8 @@
   --radius-sm: 8px;
   --shadow: 0 2px 8px rgba(0,0,0,0.4);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+  /* System bars: Android 15+ draws the app edge-to-edge behind them */
+  --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --song-font-family: var(--font-system);
@@ -71,7 +73,7 @@ input, button { font-family: inherit; }
   justify-content: center;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 24px;
+  padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom));
 }
 
 .login-card {
@@ -210,6 +212,7 @@ input, button { font-family: inherit; }
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
+  padding-top: calc(12px + var(--safe-top));
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -539,6 +542,7 @@ input, button { font-family: inherit; }
   z-index: 40;
   max-height: 90vh;
   max-height: 90dvh;
+  padding-bottom: var(--safe-bottom);
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
   animation: slideUp 0.25s ease-out;
@@ -610,7 +614,7 @@ input, button { font-family: inherit; }
 .tap-tempo-area {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
@@ -618,7 +622,7 @@ input, button { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 28px;
+  padding: 16px 24px;
   background: var(--bg-surface);
   border: 2px solid var(--border);
   border-radius: var(--radius);
@@ -629,25 +633,100 @@ input, button { font-family: inherit; }
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, transform 0.1s;
   min-height: 60px;
+  touch-action: manipulation;
 }
 .btn-tap-tempo:hover { border-color: var(--accent); }
-.btn-tap-tempo:active { background: var(--accent); color: #121212; border-color: var(--accent); }
+/* Light up instantly on the tap, fade out afterwards */
+.btn-tap-tempo:active { background: var(--accent); color: #121212; border-color: var(--accent); transition: none; }
 .btn-tap-tempo.tap-flash {
   background: var(--accent);
   color: #121212;
   border-color: var(--accent);
   transform: scale(0.95);
+  transition: none;
 }
+
+.btn-listen-tempo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  touch-action: manipulation;
+  position: relative;
+}
+.btn-listen-tempo:hover { border-color: var(--accent); }
+.btn-listen-tempo.listening {
+  border-color: var(--danger);
+  color: var(--danger);
+  animation: listenPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes listenPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 83, 80, 0); }
+}
+
+/* Input level meter, drawn inside the mic button */
+.listen-level {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 6px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.listen-level-bar {
+  display: block;
+  height: 100%;
+  background: var(--bpm-medium);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* The readout and the actions row keep a fixed size, so the bottom sheet
+   never grows (moving the TAP button from under the finger) mid-tapping */
+.tap-tempo-readout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-width: 110px;
+  min-height: 60px;
+}
+
+.tap-tempo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 48px;
+}
+.tap-tempo-actions .btn { margin-top: 12px; }
 
 .tap-tempo-display {
   font-size: 1.5rem;
   font-weight: 300;
   color: var(--text-muted);
   min-width: 100px;
+  white-space: nowrap;
   transition: color 0.2s, font-weight 0.2s;
 }
 .tap-tempo-display.tap-active {
   color: var(--accent);
+  font-weight: 700;
+}
+.tap-tempo-display.tap-tentative {
+  color: var(--text-secondary);
   font-weight: 700;
 }
 
@@ -665,6 +744,7 @@ input, button { font-family: inherit; }
   position: fixed;
   inset: 0;
   z-index: 50;
+  padding: var(--safe-top) 0 var(--safe-bottom);
   background: #121212;
   display: flex;
   flex-direction: column;
@@ -672,8 +752,16 @@ input, button { font-family: inherit; }
   justify-content: center;
 }
 
-.bpm-pulse-overlay.bg-flash {
+/* Beat flash layers: only their opacity is animated, so each beat is a
+   cheap compositor update instead of a full-screen repaint */
+.bpm-pulse-flash {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: #cc7a00;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
 }
 
 .bpm-midi-status {
@@ -720,12 +808,19 @@ input, button { font-family: inherit; }
   border-radius: 50%;
   background: var(--bg-surface);
   border: 4px solid var(--accent);
+  position: relative;
+  will-change: transform;
 }
 
-.bpm-pulse-circle.flash {
-  transform: scale(1.08);
+.bpm-pulse-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 4px solid #fff;
   box-shadow: 0 0 80px rgba(255, 183, 77, 0.6);
-  border-color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
 }
 
 .bpm-pulse-value {
@@ -734,6 +829,10 @@ input, button { font-family: inherit; }
   font-weight: 800;
   color: var(--accent);
   line-height: 1;
+  /* Same width for 2 and 3 digits, so the circle never changes size */
+  min-width: 3ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .bpm-pulse-label {
@@ -756,12 +855,100 @@ input, button { font-family: inherit; }
   height: 16px;
   border-radius: 50%;
   background: var(--border);
-  transition: background 0.06s;
+  position: relative;
 }
 
-.bpm-pulse-beat-dot.active {
+.bpm-pulse-beat-lit {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 16px rgba(255, 183, 77, 0.8);
+  opacity: 0;
+  will-change: opacity;
+}
+
+/* Set BPM circle with the live reading beside it (below on narrow screens) */
+.bpm-pulse-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-width: 100%;
+  padding: 0 8px;
+}
+
+/* Fixed width: whether the panel fits beside the circle depends only on the
+   screen and the font settings, never on the values or the advice text */
+.bpm-live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: max(6rem, calc(var(--pulse-bpm-size) * 1.2));
+  font-family: var(--pulse-font-family);
+  color: var(--text-secondary);
+}
+.bpm-live-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--danger);
+}
+.bpm-live-label::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--danger);
+  vertical-align: middle;
+}
+.bpm-live-value {
+  min-width: 3ch;
+  font-size: calc(var(--pulse-bpm-size) * 0.6);
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.bpm-live-text {
+  font-size: max(0.9rem, calc(var(--pulse-bpm-size) * 0.2));
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.bpm-live-diff { margin-top: 6px; }
+.bpm-live-ok { color: var(--bpm-medium); }
+.bpm-live-warn { color: var(--accent); }
+.bpm-live-bad { color: var(--danger); }
+.bpm-live-tentative { color: var(--text-secondary); }
+
+/* No pulsing glow here: the tempo view stays free of per-frame repaints */
+.bpm-live-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-top: 32px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-primary);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.bpm-live-btn.listening {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.bpm-live-btn .listen-level {
+  left: 18px;
+  right: 18px;
+  bottom: 10px;
 }
 
 .bpm-pulse-close {

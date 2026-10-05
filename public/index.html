@@ -171,10 +171,24 @@
               </svg>
               <span data-i18n="tapTempoBtn">TAP</span>
             </button>
-            <span id="tap-tempo-display" class="tap-tempo-display">-- <span data-i18n="tapTempoBpm">BPM</span></span>
-            <span id="tap-tempo-count" class="tap-tempo-count hidden"></span>
+            <button type="button" id="btn-listen-tempo" class="btn-listen-tempo" aria-pressed="false" data-i18n-title="listenTempo">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="2" width="6" height="12" rx="3"/>
+                <path d="M5 10v1a7 7 0 0014 0v-1"/>
+                <line x1="12" y1="18" x2="12" y2="22"/>
+              </svg>
+              <span id="listen-level" class="listen-level hidden"><span id="listen-level-bar" class="listen-level-bar"></span></span>
+            </button>
+            <div class="tap-tempo-readout">
+              <span id="tap-tempo-display" class="tap-tempo-display">-- <span data-i18n="tapTempoBpm">BPM</span></span>
+              <span id="tap-tempo-count" class="tap-tempo-count hidden"></span>
+            </div>
           </div>
-          <button type="button" id="btn-use-tap-bpm" class="btn btn-sm btn-outline hidden" data-i18n="useThisBpm">Usa questo BPM</button>
+          <div class="tap-tempo-actions">
+            <button type="button" id="btn-use-tap-bpm" class="btn btn-sm btn-outline hidden" data-i18n="useThisBpm">Usa questo BPM</button>
+            <button type="button" id="btn-bpm-half" class="btn btn-sm btn-outline hidden" data-i18n-title="halfTempo">&frac12;</button>
+            <button type="button" id="btn-bpm-double" class="btn btn-sm btn-outline hidden" data-i18n-title="doubleTempo">&times;2</button>
+          </div>
         </div>
         <div class="form-actions">
           <button type="button" id="btn-cancel-song" class="btn btn-outline" data-i18n="cancel">Annulla</button>
@@ -257,13 +271,32 @@
 
     <!-- BPM Pulse Overlay -->
     <div id="bpm-pulse" class="bpm-pulse-overlay hidden">
+      <div id="bpm-pulse-flash" class="bpm-pulse-flash"></div>
       <div id="bpm-pulse-num" class="bpm-pulse-num"></div>
       <div id="bpm-pulse-title" class="bpm-pulse-title"></div>
-      <div id="bpm-pulse-circle" class="bpm-pulse-circle">
-        <span id="bpm-pulse-value" class="bpm-pulse-value"></span>
-        <span class="bpm-pulse-label">BPM</span>
+      <div class="bpm-pulse-row">
+        <div id="bpm-pulse-circle" class="bpm-pulse-circle">
+          <div id="bpm-pulse-glow" class="bpm-pulse-glow"></div>
+          <span id="bpm-pulse-value" class="bpm-pulse-value"></span>
+          <span class="bpm-pulse-label">BPM</span>
+        </div>
+        <!-- Live tempo detected from the microphone, next to the set BPM -->
+        <div id="bpm-live" class="bpm-live hidden">
+          <span class="bpm-live-label">LIVE</span>
+          <span id="bpm-live-value" class="bpm-live-value">--</span>
+          <span id="bpm-live-diff" class="bpm-live-text bpm-live-diff">&nbsp;</span>
+          <span id="bpm-live-advice" class="bpm-live-text">&nbsp;</span>
+        </div>
       </div>
       <div id="bpm-pulse-beat" class="bpm-pulse-beat"></div>
+      <button type="button" id="btn-live-tempo" class="bpm-live-btn" aria-pressed="false" data-i18n-title="liveTempo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="2" width="6" height="12" rx="3"/>
+          <path d="M5 10v1a7 7 0 0014 0v-1"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+        </svg>
+        <span id="live-level" class="listen-level hidden"><span id="live-level-bar" class="listen-level-bar"></span></span>
+      </button>
       <div id="bpm-midi-status" class="bpm-midi-status"></div>
     </div>
 
@@ -340,7 +373,9 @@
   <script src="/src/js/components/playlist-list.js"></script>
   <script src="/src/js/components/playlist-detail.js"></script>
   <script src="/src/js/components/song-form.js"></script>
+  <script src="/src/js/bpm-detector.js"></script>
   <script src="/src/js/components/tap-tempo.js"></script>
+  <script src="/src/js/components/live-tempo.js"></script>
   <script src="/src/js/components/import-youtube.js"></script>
   <script src="/src/js/midi.js"></script>
   <script src="/src/js/app.js"></script>
@@ -348,7 +383,7 @@
   <!-- Service Worker registration -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=4').catch(function () {});
+      navigator.serviceWorker.register('/sw.js?v=5').catch(function () {});
     }
   </script>
 </body>

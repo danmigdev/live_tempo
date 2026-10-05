@@ -44,9 +44,14 @@ var MidiController = {
     });
 
     if (this.inputs.length > 0) {
+      var name = this.inputs[0].name || 'MIDI Device';
+      // statechange fires for every port (input/output, connected/open):
+      // only announce a device that actually connected or changed
+      if (!this.connected || name !== this.deviceName) {
+        showToast(name + ' connected', 'success');
+      }
       this.connected = true;
-      this.deviceName = this.inputs[0].name || 'MIDI Device';
-      showToast(this.deviceName + ' connected', 'success');
+      this.deviceName = name;
     } else {
       this.connected = false;
       this.deviceName = '';

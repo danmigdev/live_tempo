@@ -1,6 +1,6 @@
-// LiveTempo Service Worker - v4
+// LiveTempo Service Worker - v5
 // Always fetch app shell from network, cache static assets only
-const CACHE_NAME = 'livetempo-v4';
+const CACHE_NAME = 'livetempo-v5';
 
 // Never cache these - always fetch from network
 const NETWORK_ONLY = [

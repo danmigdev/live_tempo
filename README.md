@@ -8,6 +8,8 @@ Manage song playlists with BPM references for live performances. Each song has a
 - **Playlists** -- create, rename, and delete playlists
 - **Songs with BPM** -- add songs with title and BPM
 - **Tap Tempo** -- calculate BPM by tapping the rhythm on a button
+- **Automatic BPM detection** -- tap the microphone button and the app detects the tempo of the music playing around you (analyzed on the device, audio never leaves it; half/double buttons fix octave errors)
+- **Live tempo check** -- in the tempo view, the microphone button shows the tempo the band is actually playing next to the song's set BPM, with a hint to speed up or slow down
 - **PWA** -- installable on Android as a native app
 - **Dark theme** -- optimized for low-light live environments
 - **Color-coded BPM** -- slow (blue), medium (green), fast (orange)

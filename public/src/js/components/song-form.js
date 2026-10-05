@@ -18,6 +18,7 @@ var SongFormComponent = {
     });
 
     document.getElementById('btn-use-tap-bpm').addEventListener('click', function () {
+      TapTempoComponent.stopListening();
       var tapBpm = TapTempoComponent.getBpm();
       if (tapBpm > 0) {
         document.getElementById('song-bpm').value = tapBpm;
@@ -41,6 +42,7 @@ var SongFormComponent = {
   },
 
   hide: function () {
+    TapTempoComponent.stopListening();
     document.getElementById('modal-backdrop').classList.add('hidden');
     document.getElementById('modal-song-form').classList.add('hidden');
     document.getElementById('form-song').reset();

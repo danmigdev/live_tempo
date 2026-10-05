@@ -5,6 +5,8 @@ Funzionalita':
 - Crea e gestisci playlist di canzoni
 - Imposta un BPM di riferimento per ogni canzone
 - Tap Tempo: calcola il BPM battendo il ritmo
+- Rilevamento automatico del BPM dal microfono: fai ascoltare la musica all'app e trova il tempo da sola (l'audio viene analizzato sul dispositivo e non lo lascia mai)
+- Controllo del tempo dal vivo: durante il concerto vedi il tempo che la band sta suonando accanto al BPM impostato, con l'indicazione se accelerare o rallentare
 - Metronomo visivo che pulsa al tempo esatto della canzone
 - Vista tempo a schermo intero con BPM grande, leggibile a metri di distanza
 - Importa playlist direttamente da YouTube

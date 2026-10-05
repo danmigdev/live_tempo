@@ -7,7 +7,7 @@ var App = {
   previousView: null,
   confirmCallback: null,
   currentPulseSong: null,
-  currentPulseTimer: null,
+  pulseAnimations: null,
   currentPulseOverlay: null,
   currentPulseCircle: null,
   currentPulseValueEl: null,
@@ -24,6 +24,7 @@ var App = {
     PlaylistDetailComponent.init();
     SongFormComponent.init();
     TapTempoComponent.init();
+    LiveTempoComponent.init();
     YoutubeImportComponent.init();
 
     // Init MIDI once, set up navigation callbacks
@@ -261,6 +262,9 @@ var App = {
     for (var i = 0; i < 4; i++) {
       var dot = document.createElement('div');
       dot.className = 'bpm-pulse-beat-dot';
+      var lit = document.createElement('span');
+      lit.className = 'bpm-pulse-beat-lit';
+      dot.appendChild(lit);
       beatBar.appendChild(dot);
     }
 
@@ -277,56 +281,95 @@ var App = {
     }
 
     // Start the metronome — runs infinitely until dismissed
-    var intervalMs = 60000 / song.bpm;
-    var beats = 0;
-
-    // First beat immediately
-    flashBeat(0);
-
-    var timer = setInterval(function () {
-      beats++;
-      flashBeat(beats % 4);
-    }, intervalMs);
+    this.startPulseAnimation(song.bpm);
+    LiveTempoComponent.setTarget(song.bpm);
 
     // Keep reference for MIDI
     self.currentPulseSong = song;
-    self.currentPulseTimer = timer;
     self.currentPulseOverlay = overlay;
     self.currentPulseCircle = circle;
     self.currentPulseValueEl = valueEl;
 
-    function flashBeat(beatIndex) {
-      circle.classList.add('flash');
-      overlay.classList.add('bg-flash');
-      var dots = beatBar.querySelectorAll('.bpm-pulse-beat-dot');
-      dots.forEach(function (d, i) { d.classList.toggle('active', i === beatIndex); });
-      setTimeout(function () {
-        circle.classList.remove('flash');
-        overlay.classList.remove('bg-flash');
-      }, 100);
-    }
-
-    // Store current pulse song for MIDI navigation
-    var currentPulseSong = song;
-    self.currentPulseSong = song;
-
-    // Close on tap
+    // Close on tap (on the background, also beside the BPM circle)
     overlay.onclick = function (e) {
-      if (e.target === overlay) {
-        clearInterval(timer);
+      if (e.target === overlay || e.target.classList.contains('bpm-pulse-row')) {
+        self.stopPulseAnimation();
+        LiveTempoComponent.stop();
         self.currentPulseSong = null;
         overlay.classList.add('hidden');
       }
     };
 
-    // Double-tap circle to edit
+    // Double-tap circle to edit (the song shown now, also after MIDI navigation)
     circle.ondblclick = function () {
-      clearInterval(timer);
+      self.stopPulseAnimation();
+      LiveTempoComponent.stop();
       overlay.classList.add('hidden');
-      self.showSongForm(PlaylistDetailComponent.playlistId, currentPulseSong);
+      self.showSongForm(PlaylistDetailComponent.playlistId, self.currentPulseSong);
     };
 
     circle.title = 'Double-tap to edit';
+  },
+
+  // The beat flash runs as Web Animations on opacity/transform only: the browser
+  // drives them from its own frame clock (on the compositor where possible), so
+  // they don't drift like setInterval, aren't delayed by a busy main thread and
+  // don't repaint the whole screen on every beat
+  startPulseAnimation: function (bpm) {
+    this.stopPulseAnimation();
+    if (!Element.prototype.animate) return;
+
+    var beatMs = 60000 / bpm;
+    var flashEnd = Math.min(100, beatMs / 2) / beatMs;
+    var beatTiming = { duration: beatMs, iterations: Infinity };
+    var barTiming = { duration: beatMs * 4, iterations: Infinity };
+    var flash = [
+      { opacity: 1, offset: 0, easing: 'step-end' },
+      { opacity: 0, offset: flashEnd },
+      { opacity: 0, offset: 1 }
+    ];
+
+    var animations = [
+      document.getElementById('bpm-pulse-flash').animate(flash, beatTiming),
+      document.getElementById('bpm-pulse-glow').animate(flash, beatTiming),
+      document.getElementById('bpm-pulse-circle').animate([
+        { transform: 'scale(1.08)', offset: 0, easing: 'step-end' },
+        { transform: 'scale(1)', offset: flashEnd },
+        { transform: 'scale(1)', offset: 1 }
+      ], beatTiming)
+    ];
+    var lights = document.querySelectorAll('#bpm-pulse-beat .bpm-pulse-beat-lit');
+    for (var i = 0; i < lights.length; i++) {
+      animations.push(lights[i].animate(this.beatDotKeyframes(i, lights.length), barTiming));
+    }
+
+    // One shared start time keeps every element on the same beat
+    var start = document.timeline && document.timeline.currentTime;
+    if (start !== null && start !== undefined) {
+      animations.forEach(function (a) { a.startTime = start; });
+    }
+    this.pulseAnimations = animations;
+  },
+
+  stopPulseAnimation: function () {
+    if (!this.pulseAnimations) return;
+    this.pulseAnimations.forEach(function (a) { a.cancel(); });
+    this.pulseAnimations = null;
+  },
+
+  // Dot `index` of `count` stays lit during its own beat of the bar
+  beatDotKeyframes: function (index, count) {
+    var on = index / count;
+    var off = (index + 1) / count;
+    var frames = index === 0
+      ? [{ opacity: 1, offset: 0, easing: 'step-end' }]
+      : [{ opacity: 0, offset: 0, easing: 'step-end' }, { opacity: 1, offset: on, easing: 'step-end' }];
+    if (off < 1) {
+      frames.push({ opacity: 0, offset: off }, { opacity: 0, offset: 1 });
+    } else {
+      frames.push({ opacity: 1, offset: 1 });
+    }
+    return frames;
   },
 
   // Playlist name modal
@@ -476,6 +519,9 @@ var App = {
     var cls = getBpmClass(song.bpm);
     this.currentPulseCircle.style.borderColor = 'var(--' + cls + ')';
     this.currentPulseValueEl.style.color = 'var(--' + cls + ')';
+    // Pulse at the new song's tempo, not the one the view was opened with
+    this.startPulseAnimation(song.bpm);
+    LiveTempoComponent.setTarget(song.bpm);
   }
 };
 
@@ -528,7 +574,6 @@ function getBpmClass(bpm) {
 }
 
 // Toast notification system
-var toastTimer = null;
 function showToast(message, type) {
   var container = document.getElementById('toast-container');
   var toast = document.createElement('div');
@@ -540,8 +585,9 @@ function showToast(message, type) {
     toast.classList.add('toast-visible');
   });
 
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(function () {
+  // Each toast removes itself: with a shared timer, a newer toast cancelled
+  // the removal of the older ones and left them on screen for good
+  setTimeout(function () {
     toast.classList.remove('toast-visible');
     setTimeout(function () {
       if (toast.parentNode) toast.parentNode.removeChild(toast);
