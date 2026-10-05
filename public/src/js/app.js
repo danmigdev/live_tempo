@@ -170,6 +170,83 @@ var App = {
       self.handleAuthChange(user);
     });
     initAuth();
+
+    this.initBackNavigation();
+  },
+
+  // Back closes the topmost layer instead of leaving the app. In the Android app
+  // MainActivity calls handleBack() directly. In a browser, while anything is
+  // open above the playlist list, one extra history entry is kept, and going
+  // back to it closes that layer.
+  initBackNavigation: function () {
+    var self = this;
+    var isNativeApp = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+    if (isNativeApp) return;
+
+    var guarded = false;
+    var ignorePop = false;
+    var scheduled = false;
+
+    var sync = function () {
+      scheduled = false;
+      var open = self.openLayers().length > 0;
+      if (open && !guarded) {
+        history.pushState({ layer: true }, '');
+        guarded = true;
+      } else if (!open && guarded) {
+        // Everything was closed from the UI: drop the extra entry, so the
+        // next back leaves the app instead of doing nothing
+        guarded = false;
+        ignorePop = true;
+        history.back();
+      }
+    };
+
+    window.addEventListener('popstate', function () {
+      if (ignorePop) {
+        ignorePop = false;
+        return;
+      }
+      guarded = false;
+      self.handleBack();
+      sync();
+    });
+
+    // Layers open and close by toggling the hidden class: follow those changes
+    var observer = new MutationObserver(function () {
+      if (scheduled) return;
+      scheduled = true;
+      Promise.resolve().then(sync);
+    });
+    ['view-app', 'view-playlist-detail', 'bpm-pulse', 'modal-song-form', 'modal-playlist-name',
+      'modal-confirm', 'modal-yt-import', 'modal-settings'].forEach(function (id) {
+      observer.observe(document.getElementById(id), { attributes: true, attributeFilter: ['class'] });
+    });
+  },
+
+  // Closes the topmost open layer; false when there is nothing to close
+  handleBack: function () {
+    var layers = this.openLayers();
+    if (!layers.length) return false;
+    layers[0].close();
+    return true;
+  },
+
+  // Open layers above the playlist list, topmost first, with how to close each
+  openLayers: function () {
+    var self = this;
+    var visible = function (id) { return !document.getElementById(id).classList.contains('hidden'); };
+    var layers = [
+      { id: 'bpm-pulse', close: function () { self.closeBpmPulse(); } },
+      { id: 'modal-confirm', close: function () { self.hideConfirmModal(); } },
+      { id: 'modal-playlist-name', close: function () { self.hidePlaylistNameModal(); } },
+      { id: 'modal-song-form', close: function () { SongFormComponent.hide(); } },
+      { id: 'modal-yt-import', close: function () { YoutubeImportComponent.hide(); } },
+      { id: 'modal-settings', close: function () { self.hideSettings(); } },
+      { id: 'view-playlist-detail', close: function () { self.goBack(); } }
+    ];
+    if (!visible('view-app')) return [];
+    return layers.filter(function (layer) { return visible(layer.id); });
   },
 
   refreshUi: function () {
@@ -294,10 +371,7 @@ var App = {
     // Close on tap (on the background, also beside the BPM circle)
     overlay.onclick = function (e) {
       if (e.target === overlay || e.target.classList.contains('bpm-pulse-row')) {
-        self.stopPulseAnimation();
-        LiveTempoComponent.stop();
-        self.currentPulseSong = null;
-        overlay.classList.add('hidden');
+        self.closeBpmPulse();
       }
     };
 
@@ -310,6 +384,13 @@ var App = {
     };
 
     circle.title = 'Double-tap to edit';
+  },
+
+  closeBpmPulse: function () {
+    this.stopPulseAnimation();
+    LiveTempoComponent.stop();
+    this.currentPulseSong = null;
+    document.getElementById('bpm-pulse').classList.add('hidden');
   },
 
   // The beat flash runs as Web Animations on opacity/transform only: the browser

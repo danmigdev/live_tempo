@@ -4,7 +4,7 @@ Manage song playlists with BPM references for live performances. Each song has a
 
 ## Features
 
-- **Google OAuth** -- sign in with your Google account
+- **Accounts** -- sign up with email and password; playlists sync through Firebase
 - **Playlists** -- create, rename, and delete playlists
 - **Songs with BPM** -- add songs with title and BPM
 - **Tap Tempo** -- calculate BPM by tapping the rhythm on a button
@@ -20,7 +20,7 @@ Manage song playlists with BPM references for live performances. Each song has a
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Create a new project (or use an existing one)
-3. Enable **Authentication** > Sign-in method > **Google** (enable it)
+3. Enable **Authentication** > Sign-in method > **Email/Password**
 4. Enable **Cloud Firestore** in production mode
 5. Go to Project Settings > General > Your apps > Web app (</>)
 6. Register the app and copy the `firebaseConfig` object
@@ -75,23 +75,11 @@ The metadata template is in `fdroid/metadata.yml`.
 
 ### 6. Firestore Security Rules
 
-To protect data, set these rules in Firestore:
+The rules in `firestore.rules` let each user read and write only their own
+playlists, and only the songs of those playlists. Deploy them with:
 
-```js
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /playlists/{playlistId} {
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-    }
-    match /songs/{songId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
-    }
-  }
-}
+```bash
+firebase deploy --only firestore:rules
 ```
 
 ## Local Development
@@ -111,7 +99,7 @@ Open `http://localhost:8080` in the browser.
 ## Tech Stack
 
 - **Frontend**: Vanilla HTML/CSS/JS (PWA)
-- **Auth**: Firebase Authentication (Google OAuth)
+- **Auth**: Firebase Authentication (email/password)
 - **Database**: Firebase Firestore
 - **Hosting**: Firebase Hosting (free tier)
 - **Android**: Capacitor (WebView wrapper for native APK)
