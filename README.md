@@ -56,12 +56,14 @@ Edit `.firebaserc` with your Firebase project ID.
 ### 3. Deploy (Web Hosting - free)
 
 ```bash
-npm install -g firebase-tools
-firebase login
-firebase deploy
+npm install            # also copies the Firebase SDK into public/vendor
+npx firebase-tools login
+npx firebase-tools deploy --only hosting
 ```
 
-The app will be available at `https://YOUR-PROJECT.web.app`
+The app will be available at `https://YOUR-PROJECT.web.app` for anyone: each
+visitor signs up with their own email and only sees their own playlists. The
+login above is only used to upload the files and is not part of the site.
 
 ### 4. Deploy Android APK (for F-Droid)
 
