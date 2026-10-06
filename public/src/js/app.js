@@ -361,6 +361,7 @@ var App = {
     // Start the metronome — runs infinitely until dismissed
     this.startPulseAnimation(song.bpm);
     LiveTempoComponent.setTarget(song.bpm);
+    PlaylistDetailComponent.setCurrentSong(song.id);
 
     // Keep reference for MIDI
     self.currentPulseSong = song;
@@ -549,9 +550,9 @@ var App = {
         this.updatePulseDisplay();
       }
     } else {
-      // Navigate from list view: open next song's pulse
+      // Navigate from list view: open the song after the highlighted one
       if (!this.currentPlaylistId) return;
-      var startIdx = this.currentPulseSong ? songs.findIndex(function(s) { return s.id === this.currentPulseSong.id; }.bind(this)) : -1;
+      var startIdx = this.currentSongIndex(-1);
       var nextIdx = startIdx + 1;
       if (nextIdx >= songs.length) nextIdx = 0;
       this.currentPulseSong = songs[nextIdx];
@@ -573,7 +574,7 @@ var App = {
       }
     } else {
       if (!this.currentPlaylistId) return;
-      var startIdx = this.currentPulseSong ? songs.findIndex(function(s) { return s.id === this.currentPulseSong.id; }.bind(this)) : songs.length;
+      var startIdx = this.currentSongIndex(songs.length);
       var prevIdx = startIdx - 1;
       if (prevIdx < 0) prevIdx = songs.length - 1;
       this.currentPulseSong = songs[prevIdx];
@@ -582,9 +583,21 @@ var App = {
   },
 
   midiOpenCurrent: function () {
-    if (this.currentPulseSong) {
-      this.showBpmPulse(this.currentPulseSong);
+    var songs = PlaylistDetailComponent.songs;
+    var current = this.currentPulseSong || songs[this.currentSongIndex(-1)];
+    if (current) {
+      this.showBpmPulse(current);
     }
+  },
+
+  // Index of the highlighted song in the open playlist, or fallback
+  currentSongIndex: function (fallback) {
+    var id = PlaylistDetailComponent.currentSongId;
+    var songs = PlaylistDetailComponent.songs;
+    for (var i = 0; i < songs.length; i++) {
+      if (songs[i].id === id) return i;
+    }
+    return fallback;
   },
 
   updatePulseDisplay: function () {
@@ -604,6 +617,7 @@ var App = {
     // Pulse at the new song's tempo, not the one the view was opened with
     this.startPulseAnimation(song.bpm);
     LiveTempoComponent.setTarget(song.bpm);
+    PlaylistDetailComponent.setCurrentSong(song.id);
   }
 };
 
@@ -658,23 +672,27 @@ function getBpmClass(bpm) {
 // Toast notification system
 function showToast(message, type) {
   var container = document.getElementById('toast-container');
+  // The same message already on screen is not stacked again
+  for (var i = 0; i < container.children.length; i++) {
+    if (container.children[i].textContent === message) return;
+  }
+
   var toast = document.createElement('div');
   toast.className = 'toast toast-' + (type || 'info');
   toast.textContent = message;
   container.appendChild(toast);
 
+  // Each toast removes itself, timed from when it is actually on screen
+  // (animation frames wait while the app is in the background)
   requestAnimationFrame(function () {
     toast.classList.add('toast-visible');
-  });
-
-  // Each toast removes itself: with a shared timer, a newer toast cancelled
-  // the removal of the older ones and left them on screen for good
-  setTimeout(function () {
-    toast.classList.remove('toast-visible');
     setTimeout(function () {
-      if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, 300);
-  }, 2500);
+      toast.classList.remove('toast-visible');
+      setTimeout(function () {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 2500);
+  });
 }
 
 // Bootstrap the app

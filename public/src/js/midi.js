@@ -5,6 +5,8 @@ var MidiController = {
   inputs: [],
   connected: false,
   deviceName: '',
+  connectedIds: {},
+  announcedAt: {},
   onNext: null,
   onPrev: null,
   onPulse: null,
@@ -37,25 +39,32 @@ var MidiController = {
 
   setupDevices: function () {
     var self = this;
+    var now = Date.now();
+    var available = [];
     this.inputs = [];
     this.access.inputs.forEach(function (input) {
       self.inputs.push(input);
       input.onmidimessage = function (event) { self.handleMessage(event); };
+      // Chrome keeps unplugged ports in the map, marked disconnected
+      if (input.state !== 'disconnected') available.push(input);
     });
 
-    if (this.inputs.length > 0) {
-      var name = this.inputs[0].name || 'MIDI Device';
-      // statechange fires for every port (input/output, connected/open):
-      // only announce a device that actually connected or changed
-      if (!this.connected || name !== this.deviceName) {
-        showToast(name + ' connected', 'success');
+    // statechange fires for every port and state change (inputs, outputs,
+    // connected, open) and some USB devices drop and reconnect repeatedly:
+    // announce a device when it appears, the same one at most once a minute
+    var connectedIds = {};
+    available.forEach(function (input) {
+      connectedIds[input.id] = true;
+      var last = self.announcedAt[input.id];
+      if (!self.connectedIds[input.id] && (!last || now - last > 60000)) {
+        self.announcedAt[input.id] = now;
+        showToast((input.name || 'MIDI Device') + ' connected', 'success');
       }
-      this.connected = true;
-      this.deviceName = name;
-    } else {
-      this.connected = false;
-      this.deviceName = '';
-    }
+    });
+    this.connectedIds = connectedIds;
+
+    this.connected = available.length > 0;
+    this.deviceName = this.connected ? (available[0].name || 'MIDI Device') : '';
   },
 
   handleMessage: function (event) {
