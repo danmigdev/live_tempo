@@ -14,3 +14,4 @@ public/vendor/
 *.jks
 *.keystore
 ffmpeg2pass*.log*
+.firebase/
