@@ -2,6 +2,17 @@
 
 Manage song playlists with BPM references for live performances. Each song has a reference BPM so you always know how to set the tempo before starting.
 
+## Screenshots
+
+<p>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="200" alt="Playlists">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="200" alt="Songs with color-coded BPM">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="200" alt="Tempo view with the live tempo check">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="200" alt="BPM detection from the microphone">
+</p>
+
+Playlists · songs with color-coded BPM · tempo view with the live tempo check · BPM detection from the microphone
+
 ## Features
 
 - **Accounts** -- sign up with email and password; playlists sync through Firebase
