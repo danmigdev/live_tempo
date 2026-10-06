@@ -418,6 +418,12 @@ input, button { font-family: inherit; }
 }
 .song-item:active { background: var(--bg-surface-hover); }
 
+/* The song last opened in the tempo view: where we are in the set */
+.song-item.song-current {
+  background: rgba(255, 183, 77, 0.14);
+  box-shadow: 0 0 0 2px var(--accent), var(--shadow);
+}
+
 
 /* --- Song position number --- */
 .song-pos {

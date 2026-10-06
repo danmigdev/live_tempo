@@ -6,6 +6,8 @@ var PlaylistDetailComponent = {
   songs: [],
   unsubscribe: null,
   animating: false,
+  // The song last opened in the tempo view: where we are in the set
+  currentSongId: null,
 
   init: function () {
     var self = this;
@@ -39,6 +41,11 @@ var PlaylistDetailComponent = {
     var self = this;
     this.playlistId = playlistId;
     this.playlistName = playlistName;
+    try {
+      this.currentSongId = localStorage.getItem('livetempo-current-song-' + playlistId);
+    } catch (e) {
+      this.currentSongId = null;
+    }
 
     if (this.unsubscribe) this.unsubscribe();
     this.unsubscribe = subscribeSongs(playlistId, function (songs) {
@@ -71,8 +78,9 @@ var PlaylistDetailComponent = {
       emptyEl.classList.add('hidden');
       container.innerHTML = this.songs.map(function (song, index) {
         var bpmClass = getBpmClass(song.bpm);
+        var current = song.id === self.currentSongId ? ' song-current' : '';
         return '\
-          <div class="song-item" data-id="' + song.id + '" data-index="' + index + '">\
+          <div class="song-item' + current + '" data-id="' + song.id + '" data-index="' + index + '">\
             <span class="song-pos">' + (index + 1) + '</span>\
             <div class="song-info">\
               <span class="song-title">' + escapeHtml(song.title) + '</span>\
@@ -176,6 +184,24 @@ var PlaylistDetailComponent = {
       });
       document.getElementById('view-playlist-detail').appendChild(bar);
     }
+  },
+
+  // Marks the song opened in the tempo view (also via MIDI) and remembers it
+  // per playlist, so the list shows where the set is after closing the view
+  setCurrentSong: function (songId) {
+    this.currentSongId = songId;
+    try {
+      localStorage.setItem('livetempo-current-song-' + this.playlistId, songId);
+    } catch (e) {}
+
+    var current = null;
+    document.querySelectorAll('#song-list .song-item').forEach(function (item) {
+      var isCurrent = item.dataset.id === songId;
+      item.classList.toggle('song-current', isCurrent);
+      if (isCurrent) current = item;
+    });
+    // Behind the tempo view, so the song is in sight once it closes
+    if (current) current.scrollIntoView({ block: 'center' });
   },
 
   moveSong: function (songId, direction) {
